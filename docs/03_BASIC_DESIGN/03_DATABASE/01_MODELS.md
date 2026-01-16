@@ -421,6 +421,6 @@ erDiagram
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
-| key | VARCHAR（50） | NQ, NN | - | 設定キー |
+| key | VARCHAR（50） | UQ, NN | - | 設定キー |
 | value | TEXT | NN | - | 設定値 |
 | description | VARCHAR（255） | - | NULL | 説明 |
