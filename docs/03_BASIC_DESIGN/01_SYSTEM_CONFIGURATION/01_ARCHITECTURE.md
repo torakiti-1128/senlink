@@ -22,11 +22,12 @@ graph TB
     classDef supabase fill:#000,stroke:#fff,color:#fff,stroke-width:1px;
     classDef mq fill:#000,stroke:#fff,color:#fff,stroke-width:1px;
 
-    %% ユーザー層
-    User([学生 / 教員 / 管理者]):::user
-
-    %% フロントエンド層
-    Vercel[Next.js / Vercel]:::frontend
+    subgraph Frontend [ ]
+        %% ユーザー層
+        User([学生 / 教員 / 管理者]):::user
+        %% フロントエンド層
+        Vercel[Next.js / Vercel]:::frontend
+    end
 
     %% VPS内部 (Docker Compose)
     subgraph Xserver_VPS [VPS: Xserver / Docker Environment]
@@ -39,14 +40,14 @@ graph TB
 
         %% Core API（基礎API）
         subgraph CoreAPI ["Core API Container FastAPI"]
-                Ath[Auth]
-                Sch[School]
-                Job[Job]
-                Act[Activity]
-                Req[Request]
-                Not[Notification]
-                Aud[Audit]
-                Mnt[Maintenance]
+                Ath[Auth]:::internal
+                Sch[School]:::internal
+                Job[Job]:::internal
+                Act[Activity]:::internal
+                Req[Request]:::internal
+                Not[Notification]:::internal
+                Aud[Audit]:::internal
+                Mnt[Maintenance]:::internal
         end
 
         RabbitMQ["RabbitMQ Container<br/>Message Broker"]:::mq
@@ -68,11 +69,11 @@ graph TB
     Apache -->|/api/v1/gateway/*| Gateway
 
     %% Gateway -> Core API（内部HTTP呼び出し）
-    Gateway -->|Internal REST| CoreAPI
+    Gateway -->|/api/v1/*| CoreAPI
 
     %% Core API -> Data
-    Services <--> DB
-    Services <--> Storage
+    CoreAPI <--> DB
+    CoreAPI <--> Storage
 
     %% 非同期処理フロー（Core API / Worker）
     Not ---|Queueing| RabbitMQ
