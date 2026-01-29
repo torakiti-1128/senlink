@@ -40,10 +40,13 @@
 | 23 | | `request_comments` | 申請コメント | 添削指導、日程調整のやり取り |
 | 24 | | `request_attachments` | 申請添付資料 | 履歴書PDFや内定証拠画像 |
 | 25 | `Notification` | `notifications` | 通知 | 受信履歴、既読管理 |
-| 26 | `Audit` | `audit_logs` | 監査ログ | ユーザーの操作履歴 |
-| 27 | | `error_logs` | エラーログ | システム例外の記録 |
-| 28 | | `system_metrics` | システムメトリクス | リソース・応答速度監視 |
-| 29 | `Maintenance` | `system_settings` | システム設定 | マスタデータ、管理フラグ |
+| 26 | `Notification` | `notification_deliveries` | 送達状態 | チャネル別の送達状態管理 |
+| 27 | `Notification` | `account_line_links` | LINE連携 | アカウントごとのLINE連携管理 |
+| 28 | `Notification` | `notification_preferences` | 受信設定 | 受信チャネルON/OFF管理 |
+| 29 | `Audit` | `audit_logs` | 監査ログ | ユーザーの操作履歴 |
+| 30 | | `error_logs` | エラーログ | システム例外の記録 |
+| 31 | | `system_metrics` | システムメトリクス | リソース・応答速度監視 |
+| 32 | `Maintenance` | `system_settings` | システム設定 | マスタデータ、管理フラグ |
 
 ## 共通ルール
 全てのテーブルには、以下の2つのカラムが含まれるものとします（表では省略します）。
@@ -94,6 +97,9 @@ erDiagram
 
     %% Notification Service
     accounts ||--o{ notifications : "受信"
+    notifications ||--o{ notification_deliveries : "配信"
+    accounts ||--o| account_line_links : "LINE連携"
+    accounts ||--|| notification_preferences : "通知設定"
 
     %% Audit Service（論理参照）
     accounts ||--o{ audit_logs : "操作"
@@ -366,17 +372,56 @@ erDiagram
 ### 8. Notification サービス
 プッシュ通知とメール送信の制御
 
-### 8-1. notifications（通知）
+## 8-1. notifications（通知：通知センターの表示単位 / 受信者単位）
+
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
-| recipient_account_id | BIGINT | NOFK, NN | - | 受信者ID（accounts.id） |
-| title | VARCHAR（255） | NN | - | タイトル |
+| recipient_account_id | BIGINT | FK, NN | - | 受信者ID（accounts.id） |
+| title | VARCHAR(255) | NN | - | タイトル |
 | body | TEXT | - | NULL | 本文 |
-| link_url | VARCHAR（255） | NULL | URL |
+| link_url | VARCHAR(255) | - | NULL | 遷移URL |
 | type | SMALLINT | NN | - | 0:システム／1:申請／2:求人／3:活動／4:催促／5:レコメンド／9:その他 |
+| read_status | SMALLINT | NN | 0 | 0:未読／1:既読 ||
+
+## 8-2. notification_deliveries（送達状態）
+
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| id | BIGINT | PK | GENERATED | ID |
+| notification_id | BIGINT | FK, NN | - | notifications.id |
+| recipient_account_id | BIGINT | FK, NN | - | 受信者ID（検索用） |
 | channel | SMALLINT | NN | - | 0:通知センター／1:メール／2:LINE |
-| read_status | SMALLINT | NN | 0 | 0:未読／1:既読 |
+| status | SMALLINT | NN | 0 | 0:queued／1:sent／2:failed／3:skipped |
+| provider_message_id | VARCHAR(128) | - | NULL | 外部事業者のメッセージID（LINE messageId等） |
+| error_type | VARCHAR(64) | - | NULL | 失敗種別（例：LINE_BLOCKED / RATE_LIMIT 等） |
+| error_message | TEXT | - | NULL | エラー詳細 |
+| attempt_count | INT | NN | 0 | 送信試行回数 |
+| next_retry_at | TIMESTAMP | - | NULL | 次回リトライ時刻 |
+
+## 8-3. account_line_links（LINE連携）
+
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| id | BIGINT | PK | GENERATED | ID |
+| account_id | BIGINT | FK, NN, UNIQUE | - | accounts.id（1ユーザー1連携を想定） |
+| line_user_id | VARCHAR(64) | NN | - | LINE userId（push送信に必須） |
+| status | SMALLINT | NN | 0 | 0:linked／1:blocked／2:revoked |
+| linked_at | TIMESTAMP | - | NULL | 連携日時 |
+| unlinked_at | TIMESTAMP | - | NULL | 解除日時 |
+**制約（表外）：UQ（account_id, line_user_id）**
+
+## 8-4. notification_preferences（受信管理）
+
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| account_id | BIGINT | PK, FK, NN | - | accounts.id |
+| in_app_enabled | BOOLEAN | NN | true | 通知センター |
+| email_enabled | BOOLEAN | NN | true | メール |
+| line_enabled | BOOLEAN | NN | false | LINE |
+| mute_all | BOOLEAN | NN | false | 全停止 |
+| quiet_hours_start | VARCHAR(5) | - | NULL | "22:00" など（任意） |
+| quiet_hours_end | VARCHAR(5) | - | NULL | "07:00" など（任意） |
 
 ## 9. Audit サービス
 操作ログの記録、証跡管理
