@@ -40,9 +40,9 @@
 | 23 | | `request_comments` | 申請コメント | 添削指導、日程調整のやり取り |
 | 24 | | `request_attachments` | 申請添付資料 | 履歴書PDFや内定証拠画像 |
 | 25 | `Notification` | `notifications` | 通知 | 受信履歴、既読管理 |
-| 26 | `Notification` | `notification_deliveries` | 送達状態 | チャネル別の送達状態管理 |
-| 27 | `Notification` | `account_line_links` | LINE連携 | アカウントごとのLINE連携管理 |
-| 28 | `Notification` | `notification_preferences` | 受信設定 | 受信チャネルON/OFF管理 |
+| 26 | | `notification_deliveries` | 送達状態 | チャネル別の送達状態管理 |
+| 27 | | `account_line_links` | LINE連携 | アカウントごとのLINE連携管理 |
+| 28 | | `notification_preferences` | 受信設定 | 受信チャネルON/OFF管理 |
 | 29 | `Audit` | `audit_logs` | 監査ログ | ユーザーの操作履歴 |
 | 30 | | `error_logs` | エラーログ | システム例外の記録 |
 | 31 | | `system_metrics` | システムメトリクス | リソース・応答速度監視 |
@@ -194,6 +194,7 @@ erDiagram
 | class_id | BIGINT | FK, NN | - | クラスID |
 | teacher_id | BIGINT | FK, NN | - | 教員ID（teachers.id） |
 | role | SMALLINT | NN | - | 0:担任／1:副担任／3:キャリアセンター／9:その他 |
+
 **制約（表外）：UQ（class_id, teacher_id）**
 
 ## 5. Job サービス
@@ -265,6 +266,7 @@ erDiagram
 | id | BIGINT | PK | GENERATED | ID |
 | job_id | BIGINT | FK, NN | - | 求人ID（jobs.id） |
 | student_account_id | BIGINT | NOFK, NN | - | 学生アカウントID（accounts.id） |
+
 **制約：UQ（job_id, student_account_id）**
 
 ### 5-8. bookmarks（ブックマーク）
@@ -273,6 +275,7 @@ erDiagram
 | id | BIGINT | PK | GENERATED | ID |
 | job_id | BIGINT | FK, NN | - | 求人ID（jobs.id）|
 | student_account_id | BIGINT | NOFK, NN | - | 学生ID（account.id） |
+
  **制約：UQ（job_id, student_account_id）**
 
 ### 5-9. surveys（アンケート定義）
@@ -320,6 +323,7 @@ erDiagram
 | student_account_id | BIGINT | NOFK, NN | - | 学生ID（accounts.id） |
 | status | SMALLINT | NN | 0 | 0:参加前／1:参加済／2:辞退 |
 | reviewed_by_account_id | BIGINT | NOFK | NULL | 教員ID（accounts.id） |
+
 **制約（表外）：UQ（job_id, student_account_id）**
 
 ### 6-2. activity_todos（就職活動ToDo）
@@ -367,6 +371,7 @@ erDiagram
 | file_path | VARCHAR(255) | NN | - | Storage上のパス |
 | file_type | SMALLINT | NN | 0 | 0:書類／1:画像／9:その他 |
 | description | VARCHAR(255) | - | NULL | 補足 |
+
 **制約（表外）：UQ（request_id, file_path）**
 
 ### 8. Notification サービス
@@ -406,6 +411,7 @@ erDiagram
 | status | SMALLINT | NN | 0 | 0:未連携／1:連携済／2:解除 |
 | linked_at | TIMESTAMP | - | NULL | 連携日時 |
 | unlinked_at | TIMESTAMP | - | NULL | 解除日時 |
+
 **制約（表外）：UQ（account_id, line_user_id）**
 
 ## 8-4. notification_preferences（受信管理）
@@ -457,15 +463,13 @@ erDiagram
 ## 10. Maintenance サービス
 システムの設定値変更と状態管理
 
-### 10-1. system_settings（システム設定）
+### system_settings（システム設定）
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
-| key | VARCHAR（50） | UQ, NN | - | 設定キー |
-| value | TEXT | NN | - | 設定値 |
-| description | VARCHAR（255） | - | NULL | 説明 |
-
-### 10-2. delivery_reservations（配信予約）
-| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
-|:---------|:---------|:-----|:-------------|:-----|
-| id | BIGINT | PK | GENERATED | ID |
+| key | VARCHAR(50) | UQ, NN | - | 設定キー |
+| value | TEXT | NN | - | 現在の設定値 |
+| value_type | SMALLINT | NN | 0 | 0:string／1:int／2:float／3:bool／4:json |
+| description | VARCHAR(255) | - | NULL | 説明 |
+| change_counts | INT | NN | 0 | 更新回数（更新ごとに+1） |
+| is_sensitive | BOOLEAN | NN | false | 機密設定（フロント返却から除外） |
