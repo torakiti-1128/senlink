@@ -23,8 +23,8 @@ Authサービスは、SenLink の認証・認可を提供する。
 | 10 | トークン更新（Refresh） | /api/v1/auth/refresh | POST | 必要（refresh cookie） | ALL | refresh_tokenでaccess_tokenを再発行 |
 | 11 | ログアウト | /api/v1/auth/logout | POST | 必要 | ALL | Cookie削除 + refresh失効 |
 | 12 | セッション確認（me） | /api/v1/auth/me | GET | 必要 | ALL | 自分のアカウント概要を返す |
-| 13 | 権限変更（教員→管理者） | /api/v1/admin/accounts/{account_id}/role | PATCH | 必要 | 管理者 | 管理者が教員のroleを変更（付与/剥奪） |
-| 14 | アカウント無効化 | /api/v1/admin/accounts/{account_id}/deactivate | PATCH | 必要 | 管理者 | is_active=false（ログイン禁止） |
+| 13 | 権限変更（教員→管理者） | /api/v1/auth/admin/accounts/{account_id}/role | PATCH | 必要 | 管理者 | 管理者が教員のroleを変更（付与/剥奪） |
+| 14 | アカウント無効化 | /api/v1/auth/admin/accounts/{account_id}/deactivate | PATCH | 必要 | 管理者 | is_active=false（ログイン禁止） |
 
 ---
 
@@ -748,7 +748,7 @@ Set-Cookie（削除）:
 
 ## 13. 権限変更（教員→管理者）
 
-パス: `/api/v1/admin/accounts/{account_id}/role`  
+パス: `/api/v1/auth/admin/accounts/{account_id}/role`  
 メソッド: `PATCH`  
 認証: 必要  
 対象ロール: 管理者  
@@ -808,7 +808,7 @@ Set-Cookie（削除）:
 
 ## 14. アカウント無効化
 
-パス: `/api/v1/admin/accounts/{account_id}/deactivate`  
+パス: `/api/v1/auth/admin/accounts/{account_id}/deactivate`  
 メソッド: `PATCH`  
 認証: 必要  
 対象ロール: 管理者  
