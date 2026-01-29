@@ -374,8 +374,9 @@ erDiagram
 | title | VARCHAR（255） | NN | - | タイトル |
 | body | TEXT | - | NULL | 本文 |
 | link_url | VARCHAR（255） | NULL | URL |
-| type | SMALLINT | NN | 0 | 0:情報（青）／1:重要（赤）／2:承認（緑） |
-| is_read | BOOLEAN | NN | FALSE | 既読フラグ |
+| type | SMALLINT | NN | - | 0:システム／1:申請／2:求人／3:活動／4:催促／5:レコメンド／9:その他 |
+| channel | SMALLINT | NN | - | 0:通知センター／1:メール／2:LINE |
+| read_status | SMALLINT | NN | 0 | 0:未読／1:既読 |
 
 ## 9. Audit サービス
 操作ログの記録、証跡管理
