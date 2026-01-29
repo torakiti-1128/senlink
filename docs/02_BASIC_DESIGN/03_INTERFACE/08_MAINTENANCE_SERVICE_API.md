@@ -46,7 +46,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
 
 レスポンスモデル: `ApiResponse[PublicSystemSettings]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -71,7 +71,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
   },
   "operation": "maintenance_settings_public_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
@@ -98,7 +98,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
 
 レスポンスモデル: `ApiResponse[Paged[SystemSettingRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -121,7 +121,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
   },
   "operation": "maintenance_admin_settings_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
@@ -146,18 +146,18 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
 
 リクエストモデル: `UpdateSystemSettingRequest`
 
-~~~json
+```json
 {
   "value": "45",
   "valueType": 1,
   "description": "アクセストークンの有効期限（分）",
   "isSensitive": false
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[SystemSettingUpdated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -168,7 +168,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
   },
   "operation": "maintenance_admin_setting_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request（形式不正）
@@ -179,7 +179,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
 - 409: Conflict（運用上ロック/更新不可キー等がある場合）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -192,7 +192,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
   },
   "operation": "maintenance_admin_setting_update"
 }
-~~~
+```
 
 ---
 
@@ -211,18 +211,18 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
 
 リクエストモデル: `BulkUpdateSystemSettingsRequest`
 
-~~~json
+```json
 {
   "items": [
     { "key": "otp_digits", "value": "6", "valueType": 1 },
     { "key": "session_ttl_minutes", "value": "30", "valueType": 1 }
   ]
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[BulkUpdateSystemSettingsResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -234,7 +234,7 @@ Maintenanceサービスは、SenLink の **システム設定（system_settings�
   },
   "operation": "maintenance_admin_settings_bulk_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
