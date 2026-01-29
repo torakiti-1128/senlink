@@ -372,8 +372,7 @@ erDiagram
 ### 8. Notification サービス
 プッシュ通知とメール送信の制御
 
-## 8-1. notifications（通知：通知センターの表示単位 / 受信者単位）
-
+## 8-1. notifications（通知）
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
@@ -385,14 +384,13 @@ erDiagram
 | read_status | SMALLINT | NN | 0 | 0:未読／1:既読 ||
 
 ## 8-2. notification_deliveries（送達状態）
-
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
 | notification_id | BIGINT | FK, NN | - | notifications.id |
 | recipient_account_id | BIGINT | FK, NN | - | 受信者ID（検索用） |
 | channel | SMALLINT | NN | - | 0:通知センター／1:メール／2:LINE |
-| status | SMALLINT | NN | 0 | 0:queued／1:sent／2:failed／3:skipped |
+| status | SMALLINT | NN | 0 | 0:送信前／1:送信済／2:失敗 |
 | provider_message_id | VARCHAR(128) | - | NULL | 外部事業者のメッセージID（LINE messageId等） |
 | error_type | VARCHAR(64) | - | NULL | 失敗種別（例：LINE_BLOCKED / RATE_LIMIT 等） |
 | error_message | TEXT | - | NULL | エラー詳細 |
@@ -400,19 +398,17 @@ erDiagram
 | next_retry_at | TIMESTAMP | - | NULL | 次回リトライ時刻 |
 
 ## 8-3. account_line_links（LINE連携）
-
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | id | BIGINT | PK | GENERATED | ID |
-| account_id | BIGINT | FK, NN, UNIQUE | - | accounts.id（1ユーザー1連携を想定） |
-| line_user_id | VARCHAR(64) | NN | - | LINE userId（push送信に必須） |
-| status | SMALLINT | NN | 0 | 0:linked／1:blocked／2:revoked |
+| account_id | BIGINT | FK, NN, UNIQUE | - | accounts.id |
+| line_user_id | VARCHAR(64) | NN | - | LINEのユーザーId（送信に必須） |
+| status | SMALLINT | NN | 0 | 0:未連携／1:連携済／2:解除 |
 | linked_at | TIMESTAMP | - | NULL | 連携日時 |
 | unlinked_at | TIMESTAMP | - | NULL | 解除日時 |
 **制約（表外）：UQ（account_id, line_user_id）**
 
 ## 8-4. notification_preferences（受信管理）
-
 | カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
 |:---------|:---------|:-----|:-------------|:-----|
 | account_id | BIGINT | PK, FK, NN | - | accounts.id |
@@ -420,8 +416,6 @@ erDiagram
 | email_enabled | BOOLEAN | NN | true | メール |
 | line_enabled | BOOLEAN | NN | false | LINE |
 | mute_all | BOOLEAN | NN | false | 全停止 |
-| quiet_hours_start | VARCHAR(5) | - | NULL | "22:00" など（任意） |
-| quiet_hours_end | VARCHAR(5) | - | NULL | "07:00" など（任意） |
 
 ## 9. Audit サービス
 操作ログの記録、証跡管理
@@ -433,32 +427,32 @@ erDiagram
 | actor_id | BIGINT | NOFK, NN | - | 操作者ID（accounts.id） |
 | target_table | VARCHAR（50） | NN | - | 対象テーブル名 |
 | target_id | BIGINT | NN | - | 対象ID |
-| method | VARCHAR（50） | NN | - | CRUDのいずれか |
+| method | VARCHAR（50） | NN | - | 操作種別（CREATE/UPDATE/DELETE等） |
 | details | JSONB | - | NULL | 変更前後のデータ |
 | ip_address | VARCHAR（45） | - | NULL | IPアドレス |
 
 ### 9-2. error_logs（エラーログ）
-| カラム名 | データ型 | 制約 | 説明 |
-|:---------|:---------|:-----|:-----|
-| id | BIGINT | PK | エラーID |
-| service_name| VARCHAR（50） | NN | 発生元サービス（Auth, Job, Worker等） |
-| severity | SMALLINT | NN | 0:Warn／2:Error／3:Critical |
-| message | TEXT | NN | エラーメッセージの要約 |
-| stack_trace | TEXT | - | 詳細なスタックトレース（デバッグ用） |
-| request_url | TEXT | - | 発生時のAPIエンドポイントURL |
-| request_params| JSONB | - | 発生時のリクエストボディ、クエリ等 |
-| account_id | BIGINT | NOFK | 発生時にログインしていたアカウント（任意） |
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| id | BIGINT | PK | GENERATED | ID |
+| service_name| VARCHAR（50） | NN | - | 発生元サービス（Auth, Job, Worker等） |
+| severity | SMALLINT | NN | - | 0:Warn／1:Error／2:Critical |
+| message | TEXT | NN | -| エラーメッセージの要約 |
+| stack_trace | TEXT | - | - | 詳細なスタックトレース（デバッグ用） |
+| request_url | TEXT | - | - | 発生時のAPIエンドポイントURL |
+| request_params| JSONB | - | - | 発生時のリクエストボディ、クエリ等 |
+| account_id | BIGINT | NOFK | - | 発生時にログインしていたアカウント |
 
 ### 9-3. system_metrics（システムメトリクス）
-| カラム名 | データ型 | 制約 | 説明 |
-|:---------|:---------|:-----|:-----|
-| id | BIGINT | PK | メトリクスID |
-| component | VARCHAR（50） | NN | Apache／FastAPI／Worker / RabbitMQ |
-| status | SMALLINT | NN | 0:Down／1:Healthy／2:HighLoad |
-| response_time| INT | - | 平均レスポンス速度（ms） |
-| cpu_usage | NUMERIC（5,2）| - | CPU使用率（%） |
-| mem_usage | NUMERIC（5,2）| - | メモリ使用率（%） |
-| disk_usage | NUMERIC（5,2）| - | ディスク使用率（%） |
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| id | BIGINT | PK | GENERATED | ID |
+| component | VARCHAR（50） | NN | - | Apache／FastAPI／Worker / RabbitMQ |
+| status | SMALLINT | NN | - | 0:Down／1:Healthy／2:HighLoad |
+| response_time| INT | - | -| 平均レスポンス速度（ms） |
+| cpu_usage | NUMERIC（5,2）| - | - | CPU使用率（%） |
+| mem_usage | NUMERIC（5,2）| - | - | メモリ使用率（%） |
+| disk_usage | NUMERIC（5,2）| - | - | ディスク使用率（%） |
 
 ## 10. Maintenance サービス
 システムの設定値変更と状態管理
@@ -470,3 +464,8 @@ erDiagram
 | key | VARCHAR（50） | UQ, NN | - | 設定キー |
 | value | TEXT | NN | - | 設定値 |
 | description | VARCHAR（255） | - | NULL | 説明 |
+
+### 10-2. delivery_reservations（配信予約）
+| カラム名 | データ型 | 制約 | デフォルト値 | 説明 |
+|:---------|:---------|:-----|:-------------|:-----|
+| id | BIGINT | PK | GENERATED | ID |
