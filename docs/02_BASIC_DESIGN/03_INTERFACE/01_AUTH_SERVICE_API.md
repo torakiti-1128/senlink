@@ -1,6 +1,7 @@
 # API設計：Authサービス
 
 ## 概要
+
 Authサービスは、SenLink の認証・認可を提供する。
 - 認証方式：Cookie（HttpOnly） + JWT
 - ロール：0=学生 / 1=教員 / 2=管理者
@@ -39,12 +40,12 @@ Authサービスは、SenLink の認証・認可を提供する。
 
 リクエストモデル: `LoginWithPasswordRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "password": "user_password123"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[AuthSession]`
 
@@ -52,7 +53,7 @@ Set-Cookie:
 - `access_token=...; HttpOnly; Secure; SameSite=Lax; Path=/`
 - `refresh_token=...; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh（後続フェーズで有効化検討）`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -66,7 +67,7 @@ Set-Cookie:
   },
   "operation": "auth_login_password"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request（形式不正）
@@ -75,7 +76,7 @@ Set-Cookie:
 - 422: Unprocessable Entity（バリデーション不正）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -86,7 +87,7 @@ Set-Cookie:
   },
   "operation": "auth_login_password"
 }
-~~~
+```
 
 ---
 
@@ -102,15 +103,15 @@ Set-Cookie:
 
 リクエストモデル: `RequestLoginOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[OtpRequestResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -122,7 +123,7 @@ Set-Cookie:
   },
   "operation": "auth_login_otp_request"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -131,7 +132,7 @@ Set-Cookie:
 - 429: Too Many Requests（連打対策）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 429,
@@ -147,7 +148,7 @@ Set-Cookie:
   },
   "operation": "auth_login_otp_request"
 }
-~~~
+```
 
 ---
 
@@ -163,12 +164,12 @@ Set-Cookie:
 
 リクエストモデル: `VerifyLoginOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "otp": "123456"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[AuthSession]`
 
@@ -176,7 +177,7 @@ Set-Cookie:
 - `access_token=...; HttpOnly; Secure; SameSite=Lax; Path=/`
 - `refresh_token=...; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh（後続フェーズで有効化検討）`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -190,7 +191,7 @@ Set-Cookie:
   },
   "operation": "auth_login_otp_verify"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -200,7 +201,7 @@ Set-Cookie:
 - 429: Too Many Requests（試行回数制限）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -216,7 +217,7 @@ Set-Cookie:
   },
   "operation": "auth_login_otp_verify"
 }
-~~~
+```
 
 ---
 
@@ -232,15 +233,15 @@ Set-Cookie:
 
 リクエストモデル: `RequestRegisterOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[OtpRequestResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -252,7 +253,7 @@ Set-Cookie:
   },
   "operation": "auth_register_otp_request"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request（メール形式不正）
@@ -261,7 +262,7 @@ Set-Cookie:
 - 429: Too Many Requests
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -272,7 +273,7 @@ Set-Cookie:
   },
   "operation": "auth_register_otp_request"
 }
-~~~
+```
 
 ---
 
@@ -289,16 +290,16 @@ Set-Cookie:
 
 リクエストモデル: `VerifyRegisterOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "otp": "123456"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[RegisterOtpVerified]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -310,7 +311,7 @@ Set-Cookie:
   },
   "operation": "auth_register_otp_verify"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -320,7 +321,7 @@ Set-Cookie:
 - 429: Too Many Requests（試行回数制限）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -331,7 +332,7 @@ Set-Cookie:
   },
   "operation": "auth_register_otp_verify"
 }
-~~~
+```
 
 ---
 
@@ -350,13 +351,13 @@ Set-Cookie:
 
 リクエストモデル: `RegisterAccountRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "password": "user_password123",
   "registrationToken": "regtok_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[RegisterResult]`
 
@@ -364,7 +365,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 - `access_token=...; HttpOnly; Secure; SameSite=Lax; Path=/`
 - `refresh_token=...; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh（後続フェーズで有効化検討）`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -377,7 +378,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_register"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request（形式不正、registrationToken不足など）
@@ -387,7 +388,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 - 422: Unprocessable Entity（パスワードポリシー違反など）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -403,7 +404,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_register"
 }
-~~~
+```
 
 ---
 
@@ -419,15 +420,15 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 
 リクエストモデル: `RequestPasswordResetOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[OtpRequestResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -439,7 +440,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset_otp_request"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -448,7 +449,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 - 429: Too Many Requests
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -459,7 +460,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset_otp_request"
 }
-~~~
+```
 
 ---
 
@@ -475,16 +476,16 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 
 リクエストモデル: `VerifyPasswordResetOtpRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "otp": "123456"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[PasswordResetOtpVerified]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -496,7 +497,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset_otp_verify"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -506,7 +507,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 - 429: Too Many Requests
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -517,7 +518,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset_otp_verify"
 }
-~~~
+```
 
 ---
 
@@ -533,17 +534,17 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 
 リクエストモデル: `PasswordResetRequest`
 
-~~~json
+```json
 {
   "email": "1234567@school.ac.jp",
   "newPassword": "new_password_456",
   "passwordResetToken": "pwrtok_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[PasswordResetResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -554,7 +555,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -563,7 +564,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 - 422: Unprocessable Entity（パスワードポリシー違反）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -579,7 +580,7 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
   },
   "operation": "auth_password_reset"
 }
-~~~
+```
 
 ---
 
@@ -596,16 +597,16 @@ Set-Cookie（任意：登録後に自動ログインする場合）:
 
 リクエストモデル: なし（Cookieのみ）
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[RefreshResult]`
 
 Set-Cookie:
 - `access_token=...; HttpOnly; Secure; SameSite=Lax; Path=/`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -615,7 +616,7 @@ Set-Cookie:
   },
   "operation": "auth_refresh"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized（refresh_token不正/期限切れ）
@@ -623,7 +624,7 @@ Set-Cookie:
 - 500: Internal Server Error
 - 501: Not Implemented（現フェーズで無効化する場合）
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -634,7 +635,7 @@ Set-Cookie:
   },
   "operation": "auth_refresh"
 }
-~~~
+```
 
 ---
 
@@ -650,9 +651,9 @@ Set-Cookie:
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[LogoutResult]`
 
@@ -660,7 +661,7 @@ Set-Cookie（削除）:
 - `access_token=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/`
 - `refresh_token=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth/refresh`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -670,14 +671,14 @@ Set-Cookie（削除）:
   },
   "operation": "auth_logout"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized（未ログイン）
 - 403: Forbidden（学内IP外）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -688,7 +689,7 @@ Set-Cookie（削除）:
   },
   "operation": "auth_logout"
 }
-~~~
+```
 
 ---
 
@@ -704,13 +705,13 @@ Set-Cookie（削除）:
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[AccountMe]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -723,14 +724,14 @@ Set-Cookie（削除）:
   },
   "operation": "auth_me"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized（未ログイン/トークン期限切れ）
 - 403: Forbidden（学内IP外）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -741,7 +742,7 @@ Set-Cookie（削除）:
   },
   "operation": "auth_me"
 }
-~~~
+```
 
 ---
 
@@ -760,15 +761,15 @@ Set-Cookie（削除）:
 
 リクエストモデル: `UpdateAccountRoleRequest`
 
-~~~json
+```json
 {
   "role": 2
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateAccountRoleResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -780,7 +781,7 @@ Set-Cookie（削除）:
   },
   "operation": "admin_update_account_role"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request（role値不正）
@@ -790,7 +791,7 @@ Set-Cookie（削除）:
 - 409: Conflict（無効化済み等で変更不可）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -801,7 +802,7 @@ Set-Cookie（削除）:
   },
   "operation": "admin_update_account_role"
 }
-~~~
+```
 
 ---
 
@@ -819,15 +820,15 @@ Set-Cookie（削除）:
 
 リクエストモデル: `DeactivateAccountRequest`
 
-~~~json
+```json
 {
   "reason": "graduated"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[DeactivateAccountResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -839,7 +840,7 @@ Set-Cookie（削除）:
   },
   "operation": "admin_deactivate_account"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized
@@ -848,7 +849,7 @@ Set-Cookie（削除）:
 - 409: Conflict（既に無効化済み）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -859,4 +860,4 @@ Set-Cookie（削除）:
   },
   "operation": "admin_deactivate_account"
 }
-~~~
+```
