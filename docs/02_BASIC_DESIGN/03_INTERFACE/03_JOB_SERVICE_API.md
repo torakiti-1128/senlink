@@ -34,7 +34,6 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 | 6 | ブックマーク解除 | /api/v1/job/bookmarks/{job_id} | DELETE | 必要 | 学生 | 求人のブックマーク解除 |
 | 7 | 求人アンケート取得 | /api/v1/job/jobs/{job_id}/survey | GET | 必要 | 学生/教員/管理者 | 求人のアンケート（質問）を取得 |
 | 8 | 求人アンケート回答 | /api/v1/job/jobs/{job_id}/survey/response | POST | 必要 | 学生 | アンケート回答を送信 |
-
 | 9 | 求人一覧（管理） | /api/v1/job/admin/jobs | GET | 必要 | 教員/管理者 | 作成者/状態/公開期間など管理向けに取得 |
 | 10 | 求人作成 | /api/v1/job/admin/jobs | POST | 必要 | 教員/管理者 | 求人を新規作成（初期は下書き） |
 | 11 | 求人更新 | /api/v1/job/admin/jobs/{job_id} | PATCH | 必要 | 教員/管理者 | 求人情報を更新 |
@@ -77,7 +76,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `ListJobsQuery`（query）
 
-~~~json
+```json
 {
   "q": "サンプル",
   "jobType": 0,
@@ -90,11 +89,11 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "sort": "eventStartDate:asc",
   "tz": "UTC"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[Paged[JobListItem]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -128,7 +127,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized
@@ -136,7 +135,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 - 422: Unprocessable Entity（クエリ不正）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -149,7 +148,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_list"
 }
-~~~
+```
 
 ---
 
@@ -172,13 +171,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobDetailView]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -234,7 +233,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_detail"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized
@@ -242,7 +241,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 - 404: Not Found
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -253,7 +252,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_detail"
 }
-~~~
+```
 
 ---
 
@@ -273,13 +272,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobTagListResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -292,12 +291,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_tags_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -305,7 +304,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "job_tags_list"
 }
-~~~
+```
 
 ---
 
@@ -327,13 +326,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[Paged[JobBookmarkItem]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -358,12 +357,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_bookmarks_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -371,7 +370,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "FORBIDDEN", "details": [] },
   "operation": "job_bookmarks_list"
 }
-~~~
+```
 
 ---
 
@@ -388,15 +387,15 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `CreateJobBookmarkRequest`
 
-~~~json
+```json
 {
   "jobId": 4001
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobBookmarkResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -407,12 +406,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_bookmark_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（求人なし） / 409（すでに登録） / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -420,7 +419,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_bookmark_create"
 }
-~~~
+```
 
 ---
 
@@ -440,13 +439,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobBookmarkDeleteResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -457,12 +456,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_bookmark_delete"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（ブックマークなし） / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -470,7 +469,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_bookmark_delete"
 }
-~~~
+```
 
 ---
 
@@ -489,13 +488,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobSurveyView]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -523,12 +522,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_survey_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -536,7 +535,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_survey_get"
 }
-~~~
+```
 
 ---
 
@@ -556,7 +555,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `SubmitJobSurveyResponseRequest`
 
-~~~json
+```json
 {
   "surveyId": 6001,
   "answers": {
@@ -564,11 +563,11 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
     "q2": "とても良かったです"
   }
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[SurveyResponseResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -580,12 +579,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_survey_submit"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（surveyなし） / 409（既回答） / 422（回答不正） / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -598,7 +597,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_survey_submit"
 }
-~~~
+```
 
 ---
 
@@ -625,13 +624,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[Paged[AdminJobRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -656,12 +655,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -669,7 +668,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "FORBIDDEN", "details": [] },
   "operation": "job_admin_list"
 }
-~~~
+```
 
 ---
 
@@ -686,7 +685,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `CreateJobRequest`
 
-~~~json
+```json
 {
   "companyId": 2001,
   "title": "会社説明会",
@@ -700,11 +699,11 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "tagIds": [101, 201],
   "todoTemplateId": 7001
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[CreateJobResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -716,12 +715,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（company/tag/templateなし） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -729,7 +728,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_admin_create"
 }
-~~~
+```
 
 ---
 
@@ -749,18 +748,18 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `UpdateJobRequest`（部分更新）
 
-~~~json
+```json
 {
   "title": "会社説明会（改）",
   "deadline": "2026-02-03",
   "tagIds": [101, 202],
   "content": "更新した募集要項..."
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateJobResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -771,12 +770,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409（募集終了などで更新不可） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -789,7 +788,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_update"
 }
-~~~
+```
 
 ---
 
@@ -806,13 +805,13 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[DeleteJobResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -823,12 +822,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_delete"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409（応募実績があり削除不可等） / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -841,7 +840,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_delete"
 }
-~~~
+```
 
 ---
 
@@ -858,18 +857,18 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `CopyJobRequest`（任意）
 
-~~~json
+```json
 {
   "title": "会社説明会（コピー）",
   "copyScope": true,
   "copySurvey": true,
   "copyTodoTemplate": true
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[CopyJobResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -882,12 +881,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_copy"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -895,7 +894,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_admin_copy"
 }
-~~~
+```
 
 ---
 
@@ -912,17 +911,17 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
 
 リクエストモデル: `UpdateJobPublishRequest`
 
-~~~json
+```json
 {
   "status": 1,
   "publishedAt": "2026-01-16T10:30:00Z",
   "closedAt": null
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateJobPublishResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -936,12 +935,12 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_publish_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409（不正な状態遷移） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -954,7 +953,7 @@ Jobサービスは、SenLink の「求人情報」を中心に、以下を提供
   },
   "operation": "job_admin_publish_update"
 }
-~~~
+```
 
 ---
 
@@ -976,17 +975,17 @@ publish_scope（例）:
 
 リクエストモデル: `UpdateJobScopeRequest`
 
-~~~json
+```json
 {
   "publishScope": 1,
   "targetClassIds": [301, 302],
   "targetStudentAccountIds": []
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateJobScopeResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1000,12 +999,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_scope_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -1018,7 +1017,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_scope_update"
 }
-~~~
+```
 
 ---
 
@@ -1035,26 +1034,26 @@ publish_scope（例）:
 
 リクエストモデル: `UpsertJobRecommendationsRequest`
 
-~~~json
+```json
 {
   "action": "set",
   "targetStudentAccountIds": [1001, 1002],
   "note": "進路希望に合うため"
 }
-~~~
+```
 
 解除の場合:
 
-~~~json
+```json
 {
   "action": "unset",
   "targetStudentAccountIds": [1002]
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[JobRecommendationsResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1067,12 +1066,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_recommendations"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -1080,7 +1079,7 @@ publish_scope（例）:
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_admin_recommendations"
 }
-~~~
+```
 
 ---
 
@@ -1099,7 +1098,7 @@ publish_scope（例）:
 
 レスポンスモデル: `ApiResponse[TodoTemplateDetail]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1121,7 +1120,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_todo_template_get"
 }
-~~~
+```
 
 ### 17-2. 更新（PATCH）
 
@@ -1130,7 +1129,7 @@ publish_scope（例）:
 
 リクエストモデル: `UpdateTodoTemplateRequest`
 
-~~~json
+```json
 {
   "name": "説明会テンプレ（改）",
   "description": "更新版",
@@ -1153,11 +1152,11 @@ publish_scope（例）:
     }
   ]
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateTodoTemplateResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1168,12 +1167,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_todo_template_update"
 }
-~~~
+```
 
 エラーレスポンス（共通）:
 - 401 / 403 / 404 / 409（stepOrder重複など） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -1186,7 +1185,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_todo_template_update"
 }
-~~~
+```
 
 ---
 
@@ -1203,15 +1202,15 @@ publish_scope（例）:
 
 リクエストモデル: `AssignTodoTemplateToJobRequest`
 
-~~~json
+```json
 {
   "todoTemplateId": 7001
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[AssignTodoTemplateToJobResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1223,12 +1222,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_job_todo_template_assign"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -1236,7 +1235,7 @@ publish_scope（例）:
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "job_admin_job_todo_template_assign"
 }
-~~~
+```
 
 ---
 
@@ -1255,16 +1254,16 @@ publish_scope（例）:
 
 リクエストモデル: `CreateJobTagRequest`
 
-~~~json
+```json
 {
   "name": "リモート可",
   "type": 3
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[CreateJobTagResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -1275,23 +1274,23 @@ publish_scope（例）:
   },
   "operation": "job_admin_tag_create"
 }
-~~~
+```
 
 ### 19-2. 更新（PATCH）
 
 リクエストモデル: `UpdateJobTagRequest`
 
-~~~json
+```json
 {
   "tagId": 999,
   "name": "リモートワーク可",
   "type": 3
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateJobTagResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1302,7 +1301,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_tag_update"
 }
-~~~
+```
 
 ### 19-3. 削除（DELETE）
 
@@ -1311,7 +1310,7 @@ publish_scope（例）:
 
 レスポンスモデル: `ApiResponse[DeleteJobTagResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1322,12 +1321,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_tag_delete"
 }
-~~~
+```
 
 エラーレスポンス（共通）:
 - 401 / 403 / 404 / 409（求人に紐付いていて削除不可） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -1340,7 +1339,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_tag_delete"
 }
-~~~
+```
 
 ---
 
@@ -1361,7 +1360,7 @@ publish_scope（例）:
 
 レスポンスモデル: `ApiResponse[Paged[CompanyRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1381,23 +1380,23 @@ publish_scope（例）:
   },
   "operation": "job_admin_companies_list"
 }
-~~~
+```
 
 ### 20-2. 作成（POST）
 
 リクエストモデル: `CreateCompanyRequest`
 
-~~~json
+```json
 {
   "name": "株式会社BBB",
   "websiteUrl": "https://bbb.example.com",
   "address": "大阪府..."
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[CreateCompanyResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -1408,22 +1407,22 @@ publish_scope（例）:
   },
   "operation": "job_admin_company_create"
 }
-~~~
+```
 
 ### 20-3. 更新（PATCH）
 
 リクエストモデル: `UpdateCompanyRequest`
 
-~~~json
+```json
 {
   "companyId": 2010,
   "websiteUrl": "https://bbb.example.com/careers"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateCompanyResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1434,7 +1433,7 @@ publish_scope（例）:
   },
   "operation": "job_admin_company_update"
 }
-~~~
+```
 
 ### 20-4. 削除（DELETE）
 
@@ -1443,7 +1442,7 @@ publish_scope（例）:
 
 レスポンスモデル: `ApiResponse[DeleteCompanyResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -1454,12 +1453,12 @@ publish_scope（例）:
   },
   "operation": "job_admin_company_delete"
 }
-~~~
+```
 
 エラーレスポンス（共通）:
 - 401 / 403 / 404 / 409（求人が紐付いていて削除不可） / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -1472,4 +1471,4 @@ publish_scope（例）:
   },
   "operation": "job_admin_company_delete"
 }
-~~~
+```
