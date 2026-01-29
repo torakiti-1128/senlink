@@ -65,8 +65,6 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 | 13 | 教員：学生一括通知（enqueue） | /api/v1/notification/teacher/bulk | POST | 必要 | 教員/管理者 | 対象学生へ通知を作成し配信キューへ（in-app/email/LINE） |
 | 14 | 管理者：配信再試行（enqueue） | /api/v1/notification/admin/deliveries/{delivery_id}/retry | POST | 必要 | 管理者 | FAILED を再送キューへ（運用） |
 
-> 重要：テンプレ管理APIは、現スキーマ（確定4テーブル）に存在しないため本サービス仕様から削除する。
-
 ---
 
 ## 1. 通知一覧（通知センター）
@@ -92,7 +90,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[Paged[NotificationRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -115,12 +113,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -128,7 +126,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "notification_list"
 }
-~~~
+```
 
 ---
 
@@ -148,7 +146,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[NotificationDetail]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -165,13 +163,13 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500  
 ※他人の通知は 404 を返す（情報漏洩防止）
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -179,7 +177,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "notification_get"
 }
-~~~
+```
 
 ---
 
@@ -196,13 +194,13 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[MarkReadResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -214,12 +212,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_mark_read"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -227,7 +225,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "notification_mark_read"
 }
-~~~
+```
 
 ---
 
@@ -244,15 +242,15 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: `MarkNotificationsReadRequest`
 
-~~~json
+```json
 {
   "notificationIds": [50001, 50002, 50003]
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[MarkNotificationsReadResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -265,12 +263,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_mark_read_bulk"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -283,7 +281,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_mark_read_bulk"
 }
-~~~
+```
 
 ---
 
@@ -301,7 +299,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[UnreadCountResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -312,12 +310,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_unread_count"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -325,7 +323,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "FORBIDDEN", "details": [] },
   "operation": "notification_unread_count"
 }
-~~~
+```
 
 ---
 
@@ -352,7 +350,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[Paged[DeliveryRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -376,12 +374,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_delivery_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -389,7 +387,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "notification_delivery_list"
 }
-~~~
+```
 
 ---
 
@@ -410,7 +408,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[NotificationDeliveries]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -425,12 +423,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_deliveries_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 404,
@@ -438,7 +436,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "NOT_FOUND", "details": [] },
   "operation": "notification_deliveries_get"
 }
-~~~
+```
 
 ---
 
@@ -456,7 +454,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[NotificationPreferences]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -470,12 +468,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_preferences_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -483,7 +481,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "notification_preferences_get"
 }
-~~~
+```
 
 ---
 
@@ -501,18 +499,18 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: `UpdateNotificationPreferencesRequest`
 
-~~~json
+```json
 {
   "inAppEnabled": true,
   "emailEnabled": false,
   "lineEnabled": true,
   "muteAll": false
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[NotificationPreferences]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -526,13 +524,13 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_preferences_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500  
 ※LINE未連携なのに lineEnabled=true を許すかは実装方針だが、設計としては「許す（将来連携に備える）」を推奨
 
-~~~json
+```json
 {
   "success": false,
   "code": 422,
@@ -545,7 +543,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_preferences_update"
 }
-~~~
+```
 
 ---
 
@@ -562,7 +560,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 レスポンスモデル: `ApiResponse[LineLinkStatus]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -575,12 +573,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_line_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -588,7 +586,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "notification_line_get"
 }
-~~~
+```
 
 ---
 
@@ -608,16 +606,16 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: `UpsertLineLinkRequest`
 
-~~~json
+```json
 {
   "lineUserId": "Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   "linkMode": "link"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[LineLinkStatus]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -630,12 +628,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_line_link"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 409 / 422 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -648,7 +646,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_line_link"
 }
-~~~
+```
 
 ---
 
@@ -666,13 +664,13 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: なし
 
-~~~json
+```json
 {}
-~~~
+```
 
 レスポンスモデル: `ApiResponse[LineUnlinkResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -684,12 +682,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_line_unlink"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 401,
@@ -697,7 +695,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   "error": { "type": "AUTH_REQUIRED", "details": [] },
   "operation": "notification_line_unlink"
 }
-~~~
+```
 
 ---
 
@@ -718,7 +716,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: `TeacherBulkNotifyRequest`
 
-~~~json
+```json
 {
   "target": {
     "classId": 101,
@@ -732,11 +730,11 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "channels": ["in_app", "email", "line"]
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[TeacherBulkNotifyResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 202,
@@ -750,7 +748,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_teacher_bulk"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401: Unauthorized
@@ -760,7 +758,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 - 429: Too Many Requests（連打対策）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -773,7 +771,7 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_teacher_bulk"
 }
-~~~
+```
 
 ---
 
@@ -795,15 +793,15 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
 
 リクエストモデル: `RetryDeliveryRequest`（任意）
 
-~~~json
+```json
 {
   "retryAt": "2026-01-16T11:00:00Z"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[RetryDeliveryResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 202,
@@ -815,12 +813,12 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_admin_delivery_retry"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409 / 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -833,4 +831,4 @@ Notificationサービスは、SenLink の通知（通知センター表示／既
   },
   "operation": "notification_admin_delivery_retry"
 }
-~~~
+```
