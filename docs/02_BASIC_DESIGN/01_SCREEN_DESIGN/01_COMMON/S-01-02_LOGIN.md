@@ -22,7 +22,7 @@
   - ログイン方式切替（メール／パスワード／OTP）
   - 新規登録／パスワード再設定リンク
 - フッター：あり
-※ ヘッダーは非表示
+※ヘッダーは非表示
 
 ## 3. 表示項目
 - 入力項目
@@ -47,14 +47,13 @@
 
 ## 5. 関連API
 - ログイン（メール／パスワード）
-  - POST /api/v1/auth/login
-- OTP送信（ログイン用）
-  - POST /api/v1/auth/otp/send
+  - POST /api/v1/auth/login/password
+- OTP要求（ログイン用）
+  - POST /api/v1/auth/login/otp/request
 - OTP検証（ログイン用）
-  - POST /api/v1/auth/otp/verify
-- ログイン後の状態取得（初回設定判定・ロール判定）
+  - POST /api/v1/auth/login/otp/verify
+- セッション／ログイン情報確認
   - GET /api/v1/auth/me
-  - （または）GET /api/v1/auth/session
 
 ## 6. 補足
 - 認証成功時はCookie(HttpOnly)+JWTが設定される。
