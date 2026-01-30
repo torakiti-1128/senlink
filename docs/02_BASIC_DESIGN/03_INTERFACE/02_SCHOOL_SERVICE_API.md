@@ -39,6 +39,10 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 | 18 | 担当教員割当（管理） | /api/v1/school/admin/classes/{class_id}/teachers | PUT | 必要 | 管理者 | 担当教員を追加/更新（role含む） |
 | 19 | 担当教員解除（管理） | /api/v1/school/admin/classes/{class_id}/teachers/{teacher_id} | DELETE | 必要 | 管理者 | 担当教員を解除 |
 | 20 | 所属学生CSV一括操作（管理） | /api/v1/school/admin/classes/{class_id}/students/csv | POST | 必要 | 管理者 | 名簿CSVで所属変更を一括実行 |
+| 21 | 教員一覧（管理） | /api/v1/school/admin/teachers | GET | 必要 | 管理者 | 教員一覧を検索/ページングで返す（管理者画面用） |
+| 22 | 教員詳細（管理） | /api/v1/school/admin/teachers/{teacher_id} | GET | 必要 | 管理者 | 指定教員の詳細を返す（プロフィール参照） |
+| 23 | 担当クラス一覧（教員単位・管理） | /api/v1/school/admin/teachers/{teacher_id}/classes | GET | 必要 | 管理者 | 指定教員が担当するクラス一覧を返す（class_teachers） |
+
 
 ---
 
@@ -56,7 +60,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[DepartmentList]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -69,7 +73,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_departments_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
@@ -93,7 +97,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[ClassList]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -112,7 +116,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_classes_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 422 / 500
@@ -132,7 +136,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `CreateStudentProfileOnboardingRequest`
 
-~~~json
+```json
 {
   "classId": 301,
   "studentNumber": "1234567",
@@ -142,11 +146,11 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   "gender": 1,
   "admissionYear": 2026
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[StudentProfileCreated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -160,7 +164,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_onboarding_student_profile_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 400: Bad Request
@@ -170,7 +174,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 - 422: Unprocessable Entity（バリデーション不正）
 - 500: Internal Server Error
 
-~~~json
+```json
 {
   "success": false,
   "code": 409,
@@ -183,7 +187,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_onboarding_student_profile_create"
 }
-~~~
+```
 
 ---
 
@@ -200,7 +204,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `CreateTeacherProfileOnboardingRequest`
 
-~~~json
+```json
 {
   "name": "田中 教員",
   "nameKana": "たなか きょういん",
@@ -211,11 +215,11 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
     "bio": "キャリアセンター担当です。"
   }
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[TeacherProfileCreated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -226,7 +230,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_onboarding_teacher_profile_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 409 / 422 / 500
@@ -246,7 +250,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[StudentMe]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -283,7 +287,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_students_me_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（プロフィール未作成）/ 500
@@ -303,7 +307,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpdateStudentJobProfileRequest`
 
-~~~json
+```json
 {
   "profileData": {
     "desiredJobTypes": ["バックエンド"],
@@ -313,11 +317,11 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
     "portfolioUrl": "https://example.com"
   }
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateStudentJobProfileResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -327,7 +331,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_students_me_profile_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
@@ -347,15 +351,15 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpdateJobHuntingStatusRequest`
 
-~~~json
+```json
 {
   "isJobHunting": false
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateJobHuntingStatusResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -366,7 +370,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_students_me_job_hunting_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
@@ -386,7 +390,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[TeacherMe]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -405,7 +409,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_teachers_me_get"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
@@ -425,7 +429,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpdateTeacherProfileRequest`
 
-~~~json
+```json
 {
   "title": "副担任",
   "officeLocation": "202号室",
@@ -434,11 +438,11 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
     "bio": "ES添削を担当しています。"
   }
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[UpdateTeacherProfileResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -448,7 +452,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_teachers_me_profile_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422 / 500
@@ -468,7 +472,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[TeacherClassList]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -487,7 +491,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_teacher_classes_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 500
@@ -516,7 +520,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[Paged[ClassStudentRow]]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -538,7 +542,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_class_students_list"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401
@@ -547,7 +551,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 - 422
 - 500
 
-~~~json
+```json
 {
   "success": false,
   "code": 403,
@@ -560,7 +564,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "school_class_students_list"
 }
-~~~
+```
 
 ---
 
@@ -577,16 +581,16 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `CreateDepartmentRequest`
 
-~~~json
+```json
 {
   "name": "情報",
   "code": "INF"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[DepartmentCreated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -596,7 +600,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_departments_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 409（code重複など）/ 422 / 500
@@ -616,16 +620,16 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpdateDepartmentRequest`
 
-~~~json
+```json
 {
   "name": "情報工学",
   "code": "INF"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[DepartmentUpdated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -636,7 +640,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_departments_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409 / 422 / 500
@@ -656,7 +660,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[DepartmentDeleted]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -667,7 +671,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_departments_delete"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409 / 500
@@ -687,18 +691,18 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `CreateClassRequest`
 
-~~~json
+```json
 {
   "departmentId": 1,
   "fiscalYear": 2026,
   "grade": 3,
   "name": "A組"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[ClassCreated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 201,
@@ -708,7 +712,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_classes_create"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 409（同一年度・同一学科・同一名称の重複を禁止する運用の場合）/ 422 / 500
@@ -728,18 +732,18 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpdateClassRequest`
 
-~~~json
+```json
 {
   "departmentId": 1,
   "fiscalYear": 2027,
   "grade": 1,
   "name": "新A組"
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[ClassUpdated]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -750,7 +754,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_classes_update"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409 / 422 / 500
@@ -770,7 +774,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[ClassDeleted]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -781,7 +785,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_classes_delete"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 409 / 500
@@ -801,16 +805,16 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 リクエストモデル: `UpsertClassTeacherRequest`
 
-~~~json
+```json
 {
   "teacherId": 7001,
   "role": 0
 }
-~~~
+```
 
 レスポンスモデル: `ApiResponse[ClassTeacherUpserted]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -823,7 +827,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_class_teachers_upsert"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404（class/teacherなし）/ 422 / 500
@@ -843,7 +847,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
 
 レスポンスモデル: `ApiResponse[ClassTeacherDeleted]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -855,7 +859,7 @@ Schoolサービスは、学校情報（学科・クラス）および学校ユ�
   },
   "operation": "admin_class_teachers_delete"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 500
@@ -884,7 +888,7 @@ CSVフォーマット（例）:
 
 レスポンスモデル: `ApiResponse[CsvBatchResult]`
 
-~~~json
+```json
 {
   "success": true,
   "code": 200,
@@ -901,7 +905,215 @@ CSVフォーマット（例）:
   },
   "operation": "admin_class_students_csv"
 }
-~~~
+```
 
 エラーレスポンス:
 - 401 / 403 / 404 / 422（CSV形式不正）/ 500
+
+---
+
+## 21. 教員一覧（管理）
+
+パス: `/api/v1/school/admin/teachers`  
+メソッド: `GET`  
+認証: 必要  
+対象ロール: 管理者  
+説明: 管理者が教員一覧を検索・ページング取得する（管理者画面用）。  
+補足：
+- accounts.role の参照/変更は Auth サービスの責務のため、本APIは role を返さない（teachers + 最小限の参照情報のみ）。
+- teachers は account_id を持つため、管理画面側で「管理者付与（Auth）」操作の対象を特定できる（accountId）。
+
+リクエストヘッダー:
+- `Accept: application/json`
+
+クエリパラメータ:
+- `q` (optional): string（氏名/氏名カナ/役職/オフィス 部分一致）
+- `sort` (optional, default="nameKana:asc"): `nameKana:asc|desc`, `createdAt:desc|asc`, `updatedAt:desc|asc`
+- `page` (optional, default=1): int
+- `pageSize` (optional, default=20): int
+
+レスポンスモデル: `ApiResponse[Paged[TeacherAdminRow]]`
+
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "items": [
+      {
+        "teacherId": 7001,
+        "accountId": 2001,
+        "name": "田中 教員",
+        "nameKana": "たなか きょういん",
+        "title": "担任",
+        "officeLocation": "201号室",
+        "updatedAt": "2026-01-29T10:00:00Z"
+      }
+    ],
+    "page": 1,
+    "pageSize": 20,
+    "total": 58
+  },
+  "operation": "school_admin_teachers_list"
+}
+```
+
+エラーレスポンス:
+- 401: Unauthorized
+- 403: Forbidden（管理者権限なし / 学内IP外）
+- 422: Unprocessable Entity（クエリ不正）
+- 500: Internal Server Error
+
+```json
+{
+  "success": false,
+  "code": 403,
+  "message": "Admin privilege required",
+  "error": { "type": "FORBIDDEN", "details": [] },
+  "operation": "school_admin_teachers_list"
+}
+```
+
+---
+
+## 22. 教員詳細（管理）
+
+パス: `/api/v1/school/admin/teachers/{teacher_id}`  
+メソッド: `GET`  
+認証: 必要  
+対象ロール: 管理者  
+説明: 指定教員（teachers）の詳細を返す（プロフィール参照）。  
+補足：
+- 担当クラス一覧は本APIには内包しない（粒度を合わせ、No.23で別API）。
+
+リクエストヘッダー:
+- `Accept: application/json`
+
+パスパラメータ:
+- `teacher_id`: BIGINT
+
+レスポンスモデル: `ApiResponse[TeacherAdminDetail]`
+
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "teacherId": 7001,
+    "accountId": 2001,
+    "name": "田中 教員",
+    "nameKana": "たなか きょういん",
+    "title": "担任",
+    "officeLocation": "201号室",
+    "profileData": {
+      "specialties": ["キャリア支援", "面接対策"],
+      "bio": "キャリアセンター担当です。"
+    },
+    "createdAt": "2026-01-10T00:00:00Z",
+    "updatedAt": "2026-01-29T10:00:00Z"
+  },
+  "operation": "school_admin_teachers_get"
+}
+```
+
+エラーレスポンス:
+- 401: Unauthorized
+- 403: Forbidden（管理者権限なし / 学内IP外）
+- 404: Not Found（teacherなし）
+- 500: Internal Server Error
+
+```json
+{
+  "success": false,
+  "code": 404,
+  "message": "Teacher not found",
+  "error": { "type": "NOT_FOUND", "details": [] },
+  "operation": "school_admin_teachers_get"
+}
+```
+
+---
+
+## 23. 担当クラス一覧（教員単位・管理）
+
+パス: `/api/v1/school/admin/teachers/{teacher_id}/classes`  
+メソッド: `GET`  
+認証: 必要  
+対象ロール: 管理者  
+説明: 指定教員が担当するクラス一覧を返す（class_teachers を参照）。  
+補足：
+- class_teachers.role を teacherRole として返す。
+- classes および departments を参照して、画面表示に必要な所属情報を含める。
+
+リクエストヘッダー:
+- `Accept: application/json`
+
+パスパラメータ:
+- `teacher_id`: BIGINT
+
+クエリパラメータ:
+- `fiscalYear` (optional): int
+- `departmentId` (optional): BIGINT
+- `sort` (optional, default="fiscalYear:desc,grade:desc,name:asc"):
+  - `fiscalYear:desc|asc`
+  - `grade:desc|asc`
+  - `name:asc|desc`
+
+レスポンスモデル: `ApiResponse[TeacherAssignedClassList]`
+
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "teacherId": 7001,
+    "items": [
+      {
+        "classId": 301,
+        "department": {
+          "departmentId": 1,
+          "name": "情報",
+          "code": "INF"
+        },
+        "fiscalYear": 2026,
+        "grade": 3,
+        "name": "A組",
+        "teacherRole": 0
+      },
+      {
+        "classId": 302,
+        "department": {
+          "departmentId": 1,
+          "name": "情報",
+          "code": "INF"
+        },
+        "fiscalYear": 2026,
+        "grade": 3,
+        "name": "B組",
+        "teacherRole": 1
+      }
+    ]
+  },
+  "operation": "school_admin_teacher_classes_list"
+}
+```
+
+エラーレスポンス:
+- 401: Unauthorized
+- 403: Forbidden（管理者権限なし / 学内IP外）
+- 404: Not Found（teacherなし）
+- 422: Unprocessable Entity（クエリ不正）
+- 500: Internal Server Error
+
+```json
+{
+  "success": false,
+  "code": 404,
+  "message": "Teacher not found",
+  "error": { "type": "NOT_FOUND", "details": [] },
+  "operation": "school_admin_teacher_classes_list"
+}
+```
