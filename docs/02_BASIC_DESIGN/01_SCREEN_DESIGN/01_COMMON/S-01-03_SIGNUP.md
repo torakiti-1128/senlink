@@ -41,13 +41,12 @@
   - S-01-02へ遷移
 
 ## 5. 関連API
-- OTP送信（新規登録用）
-  - POST /api/v1/auth/otp/send
 - 新規登録（アカウント作成）
-  - POST /api/v1/auth/signup
-  - （運用代替）POST /api/v1/auth/register
+  - POST /api/v1/auth/register
+- OTP要求（新規登録用）
+  - POST /api/v1/auth/register/otp/request
 - OTP検証（新規登録用）
-  - POST /api/v1/auth/otp/verify
+  - POST /api/v1/auth/register/otp/verify
 - 登録後の状態取得（初回設定判定／ロール判定）
   - GET /api/v1/auth/me
 
