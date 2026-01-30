@@ -31,7 +31,6 @@ Activityサービスは、学生の「応募・参加・選考の進捗（活動
 | 5 | ToDo更新（完了/未完了等） | /api/v1/activity/todos/{todo_id} | PATCH | 必要 | 学生 | ToDoのステータス更新 |
 | 6 | 辞退申請（学生） | /api/v1/activity/activities/{activity_id}/withdrawal | POST | 必要 | 学生 | 辞退申請を作成（教員承認フロー） |
 | 7 | 辞退申請状況取得（学生） | /api/v1/activity/activities/{activity_id}/withdrawal | GET | 必要 | 学生 | 自分の辞退申請の状態を取得 |
-
 | 8 | 活動一覧（教員/管理者） | /api/v1/activity/admin/activities | GET | 必要 | 教員/管理者 | クラス/学生単位で活動一覧を取得（監督・指導用） |
 | 9 | 活動詳細（教員/管理者） | /api/v1/activity/admin/activities/{activity_id} | GET | 必要 | 教員/管理者 | 学生活動の詳細を参照（指導用） |
 | 10 | ToDo一覧（教員/管理者） | /api/v1/activity/admin/activities/{activity_id}/todos | GET | 必要 | 教員/管理者 | 指導に必要なToDo状況参照 |
