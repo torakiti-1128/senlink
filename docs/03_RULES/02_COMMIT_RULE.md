@@ -23,10 +23,10 @@
 - `api`, `service`, `domain`, `infra`, `shared`, `worker`, `db`, `ci`
 
 ### 具体的な例
-- `feat: Jobサービス関連のテーブル定義を追加 (#7)`
-- `chore: Npgsqlパッケージをインストール (#7)`
-- `docs: コミットルールガイドを追加 (#8)`
-- `fix: Docker Compose の環境変数を修正 (#1)`
+- `feat): Jobサービス関連のテーブル定義を追加 (#7)`
+- `chore(api): Npgsqlパッケージをインストール (#7)`
+- `docs(git): コミットルールガイドを追加 (#8)`
+- `fix(infra): Docker Compose の環境変数を修正 (#1)`
 
 ---
 
