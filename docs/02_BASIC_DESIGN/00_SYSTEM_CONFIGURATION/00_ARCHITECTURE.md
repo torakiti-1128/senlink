@@ -33,7 +33,7 @@ graph TB
 
         Apache[Apache Container<br/>Reverse Proxy]:::container
 
-        subgraph CoreAPI ["Core API Container<br/>FastAPI"]
+        subgraph CoreAPI ["Core API Container<br/>ASP.NET Core"]
             direction TB
             Router[API Router<br/>/api/v1/*]:::container
 
@@ -46,7 +46,7 @@ graph TB
         end
 
         RabbitMQ["RabbitMQ Container<br/>Message Broker"]:::mq
-        Worker["Worker Container<br/>Celery／Background Tasks"]:::mq
+        Worker["Worker Container<br/>.NET Background Service"]:::mq
     end
 
     subgraph Supabase_Cloud [Supabase]
@@ -82,7 +82,7 @@ graph TB
 ### 2-1. ネットワーク
 1. **User** → HTTPS → **Next.js（Vercel）**
 2. **Vercel** → API Request → **Apache（VPS）**
-3. **Apache** → Reverse Proxy → **Core API（FastAPI）**
+3. **Apache** → Reverse Proxy → **Core API（ASP.NET Core Web API）**
 4. **Core API** → Data Access → **Supabase（PostgreSQL／Storage）**
 5. **非同期処理**：Core API → RabbitMQ → Worker → DB更新／通知送信
 
@@ -150,7 +150,7 @@ Supabaseは以下を利用します。
 
 - **PostgreSQL**
   - リレーショナルデータの保存
-  - FastAPI（SQLAlchemy）から接続
+  - ASP.NET Core Web API（EF Core）から接続
 - **Storage**
   - PDF/画像等の添付ファイルを保存（申請添付、ポートフォリオ等）
 
