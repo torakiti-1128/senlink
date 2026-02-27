@@ -3,6 +3,9 @@ using SenLink.Domain.Modules.Auth.Entities;
 
 namespace SenLink.Infrastructure.Persistence;
 
+/// <summary>
+/// SenLink アプリケーションの EF Core DbContext
+/// </summary>
 public class SenLinkDbContext : DbContext
 {
     public SenLinkDbContext(DbContextOptions<SenLinkDbContext> options) : base(options) { }
@@ -13,7 +16,7 @@ public class SenLinkDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Infrastructure内の全 IEntityTypeConfiguration を自動適用
+        // Infrastructure 内の全 IEntityTypeConfiguration を自動適用
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SenLinkDbContext).Assembly);
         
         base.OnModelCreating(modelBuilder);

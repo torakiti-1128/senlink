@@ -1,44 +1,40 @@
+using Microsoft.EntityFrameworkCore;
+using SenLink.Infrastructure.Persistence;
+
+// SenLink API アプリケーションのエントリーポイント
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// サービス登録
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
+// DB接続設定
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<SenLinkDbContext>(options =>
+    options.UseNpgsql(
+        connectionString,
+        b => b.MigrationsAssembly("SenLink.Infrastructure")
+    ));
+
+// アプリケーションビルド
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 開発環境でのみSwagger UIを有効化
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// HTTP → HTTPS リダイレクト
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// 認証・認可
+app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+// コントローラーのURLマッピング
+app.MapControllers();
 
+// アプリケーション起動
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

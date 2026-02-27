@@ -4,6 +4,9 @@ using SenLink.Domain.Modules.Auth.Entities;
 
 namespace SenLink.Infrastructure.Modules.Auth.Persistence.Configurations;
 
+/// <summary>
+/// Account エンティティの EF Core 設定
+/// </summary>
 public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
