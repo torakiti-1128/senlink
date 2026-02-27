@@ -10,11 +10,11 @@ public class Account : BaseEntity
     // メールアドレス (UQ, NN)
     public string Email { get; set; } = string.Empty;
 
-    // パスワード（Hash） (NN)
+    // パスワード（Hash, NN)
     public string Password { get; set; } = string.Empty;
 
-    // ロール (NN) 0:学生／1:教員／2:管理者
-    public short Role { get; set; }
+    // ロール (NN)
+    public AccountRole Role { get; set; }
 
     // 有効フラグ (NN)
     public bool IsActive { get; set; } = true;
