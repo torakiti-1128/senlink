@@ -1,3 +1,5 @@
+using SenLink.Domain.Common;
+
 namespace SenLink.Domain.Modules.Auth.Entities;
 
 /// <summary>
