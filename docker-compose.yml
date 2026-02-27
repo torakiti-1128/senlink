@@ -1,0 +1,39 @@
+services:
+  # 1. Reverse Proxy (Apache)
+  apache:
+    image: httpd:alpine
+    ports:
+      - "8080:80"
+    # infrastructure/apache/httpd.conf ができたらマウントする
+    depends_on:
+      - core-api
+
+  # 2. Core API (ASP.NET Core)
+  core-api:
+    build:
+      context: .
+      dockerfile: src/SenLink.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5000:8080"
+    depends_on:
+      - rabbitmq
+
+  # 3. Message Broker (RabbitMQ)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # 4. Worker (.NET Runtime)
+  worker:
+    build:
+      context: .
+      dockerfile: src/SenLink.Worker/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    depends_on:
+      - rabbitmq
