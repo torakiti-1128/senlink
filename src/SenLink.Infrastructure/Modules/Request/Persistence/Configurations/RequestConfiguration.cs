@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SenLink.Domain.Modules.Request.Entities;
 using SenLink.Domain.Modules.Request.Enums;
 
 namespace SenLink.Infrastructure.Modules.Request.Persistence.Configurations;
@@ -30,10 +31,13 @@ public class RequestConfiguration : IEntityTypeConfiguration<Domain.Modules.Requ
         builder.Property(e => e.Title).IsRequired().HasMaxLength(255);
 
         // 種別ごとの入力内容 (JSONB, NN)
-        builder.OwnsOne(e => e.Payload, p =>
-        {
-            p.ToJson();
-        });
+        builder.Property(e => e.Payload)
+            .HasColumnType("jsonb")
+            .IsRequired()
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<RequestPayload>(v, (System.Text.Json.JsonSerializerOptions?)null)!
+            );
 
         // 申請送信日時 (TIMESTAMP)
         builder.Property(e => e.SubmittedAt);

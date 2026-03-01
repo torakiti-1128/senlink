@@ -34,7 +34,12 @@ public class ErrorLogConfiguration : IEntityTypeConfiguration<ErrorLog>
         builder.Property(e => e.RequestUrl).HasColumnType("text");
 
         // 発生時のリクエストボディ、クエリ等 (JSONB)
-        builder.OwnsOne(e => e.RequestParams, p => { p.ToJson(); });
+        builder.Property(e => e.RequestParams)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<RequestParams>(v, (System.Text.Json.JsonSerializerOptions?)null)
+            );
 
         // 発生時にログインしていたアカウントID (NOFK, accounts.id)
         builder.Property(e => e.AccountId);

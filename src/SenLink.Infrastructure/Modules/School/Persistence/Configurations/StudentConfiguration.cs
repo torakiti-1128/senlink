@@ -47,10 +47,12 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder.Property(e => e.IsJobHunting).IsRequired().HasDefaultValue(true);
 
         // プロフィールデータ (JSONB)
-        builder.OwnsOne(e => e.ProfileData, p =>
-        {
-            p.ToJson();
-        });
+        builder.Property(e => e.ProfileData)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<StudentProfile>(v, (System.Text.Json.JsonSerializerOptions?)null)
+            );
 
         // クラスとのリレーション (1対多)
         builder.HasOne(e => e.Class)

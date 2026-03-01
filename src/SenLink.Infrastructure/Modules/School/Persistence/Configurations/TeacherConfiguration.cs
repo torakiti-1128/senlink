@@ -34,10 +34,12 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
         builder.Property(e => e.OfficeLocation).HasMaxLength(100);
 
         // プロフィールデータ (JSONB) .NET 8のJSONマッピング機能を使用
-        builder.OwnsOne(e => e.ProfileData, p =>
-        {
-            p.ToJson();
-        });
+        builder.Property(e => e.ProfileData)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<TeacherProfile>(v, (System.Text.Json.JsonSerializerOptions?)null)
+            );
 
         // 作成日時 (TIMESTAMP)
         builder.Property(x => x.CreatedAt)

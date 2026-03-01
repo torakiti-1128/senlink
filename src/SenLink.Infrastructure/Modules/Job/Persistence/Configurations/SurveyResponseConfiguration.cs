@@ -24,10 +24,13 @@ public class SurveyResponseConfiguration : IEntityTypeConfiguration<SurveyRespon
         builder.Property(e => e.StudentAccountId).IsRequired();
 
         // 回答内容 (JSONB, NN)
-        builder.OwnsOne(e => e.Answers, a =>
-        {
-            a.ToJson(); // PostgreSQLのJSONBカラムとしてマッピング
-        });
+        builder.Property(e => e.Answers)
+            .HasColumnType("jsonb")
+            .IsRequired()
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<SurveyAnswers>(v, (System.Text.Json.JsonSerializerOptions?)null)!
+            );
 
         // アンケート定義とのリレーション (多対1)
         builder.HasOne(e => e.Survey)

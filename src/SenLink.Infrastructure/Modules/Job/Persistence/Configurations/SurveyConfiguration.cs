@@ -24,10 +24,13 @@ public class SurveyConfiguration : IEntityTypeConfiguration<Survey>
         builder.Property(e => e.Title).IsRequired().HasMaxLength(255);
 
         // 質問項目 (JSONB, NN)
-        builder.OwnsOne(e => e.Questions, q =>
-        {
-            q.ToJson(); // PostgreSQLのJSONBカラムとしてマッピング
-        });
+        builder.Property(e => e.Questions)
+            .HasColumnType("jsonb")
+            .IsRequired()
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<SurveyQuestions>(v, (System.Text.Json.JsonSerializerOptions?)null)!
+            );
 
         // 求人とのリレーション (多対1)
         builder.HasOne(e => e.Job)

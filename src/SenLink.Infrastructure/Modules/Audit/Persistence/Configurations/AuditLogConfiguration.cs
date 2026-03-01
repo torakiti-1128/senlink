@@ -31,7 +31,12 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.Property(e => e.Method).IsRequired().HasMaxLength(50);
 
         // 変更前後のデータ (JSONB)
-        builder.OwnsOne(e => e.Details, d => { d.ToJson(); });
+        builder.Property(e => e.Details)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<AuditLogDetails>(v, (System.Text.Json.JsonSerializerOptions?)null)
+            );
 
         // IPアドレス (VARCHAR(45))
         builder.Property(e => e.IpAddress).HasMaxLength(45);
