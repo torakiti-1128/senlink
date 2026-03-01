@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SenLink.Domain.Modules.Activity.Enums;
 
 namespace SenLink.Infrastructure.Modules.Activity.Persistence.Configurations;
 
@@ -26,7 +27,7 @@ public class ActivityConfiguration : IEntityTypeConfiguration<Domain.Modules.Act
         builder.HasIndex(e => new { e.JobId, e.StudentAccountId }).IsUnique();
 
         // ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.Status).IsRequired().HasDefaultValue((ActivityStatus)0);
 
         // 教員ID (NOFK, accounts.id)
         builder.Property(e => e.ReviewedByAccountId);
