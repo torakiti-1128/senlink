@@ -17,5 +17,5 @@ public class LoginHistory : BaseEntity
     public string? UserAgent { get; set; }
 
     // ステータス (SMALLINT) 0:失敗／1:成功
-    public short Status { get; set; }
+    public LoginStatus Status { get; set; }
 }
