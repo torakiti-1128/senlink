@@ -3,6 +3,9 @@ using SenLink.Domain.Modules.School.Enums;
 
 namespace SenLink.Domain.Modules.School.Entities;
 
+/// <summary>
+/// クラス担任：クラスと教師の多対多リレーションを管理し、担任、副担任などの役割を持たせる
+/// </summary>
 public class ClassTeacher : BaseEntity
 {
     // クラスID (FK, NN)
