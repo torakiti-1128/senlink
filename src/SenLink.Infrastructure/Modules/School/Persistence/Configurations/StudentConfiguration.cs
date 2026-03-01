@@ -57,5 +57,15 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .WithMany(c => c.Students)
             .HasForeignKey(e => e.ClassId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // 作成日時 (TIMESTAMP)
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
+
+        // 更新日時 (TIMESTAMP)
+        builder.Property(x => x.UpdatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
     }
 }

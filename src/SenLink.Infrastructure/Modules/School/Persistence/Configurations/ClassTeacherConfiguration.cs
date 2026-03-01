@@ -40,5 +40,15 @@ public class ClassTeacherConfiguration : IEntityTypeConfiguration<ClassTeacher>
             .WithMany(t => t.ClassTeachers)
             .HasForeignKey(e => e.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // 作成日時 (TIMESTAMP)
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
+
+        // 更新日時 (TIMESTAMP)
+        builder.Property(x => x.UpdatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
     }
 }

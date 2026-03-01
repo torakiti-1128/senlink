@@ -38,5 +38,15 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
         {
             p.ToJson();
         });
+
+        // 作成日時 (TIMESTAMP)
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
+
+        // 更新日時 (TIMESTAMP)
+        builder.Property(x => x.UpdatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
     }
 }
