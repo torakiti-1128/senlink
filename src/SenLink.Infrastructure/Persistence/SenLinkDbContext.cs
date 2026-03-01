@@ -1,8 +1,11 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using SenLink.Domain.Modules.Activity.Entities;
+using SenLink.Domain.Modules.Audit.Entities;
 using SenLink.Domain.Modules.Auth.Entities;
 using SenLink.Domain.Modules.Job.Entities;
+using SenLink.Domain.Modules.Maintenance.Entities;
+using SenLink.Domain.Modules.Notification.Entities;
 using SenLink.Domain.Modules.Request.Entities;
 using SenLink.Domain.Modules.School.Entities;
 
@@ -51,6 +54,20 @@ public class SenLinkDbContext : DbContext
     public DbSet<Request> Requests => Set<Request>();
     public DbSet<RequestComment> RequestComments => Set<RequestComment>();
     public DbSet<RequestAttachment> RequestAttachments => Set<RequestAttachment>();
+
+    // Notification Service Entities
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationDelivery> NotificationDeliveries => Set<NotificationDelivery>();
+    public DbSet<AccountLineLink> AccountLineLinks => Set<AccountLineLink>();
+    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
+
+    // Audit Service Entities
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ErrorLog> ErrorLogs => Set<ErrorLog>();
+    public DbSet<SystemMetric> SystemMetrics => Set<SystemMetric>();
+
+    // Maintenance Service Entities
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
 
     /// <summary>
     /// モデルを構成する
