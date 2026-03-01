@@ -37,7 +37,7 @@ public class ClassConfiguration : IEntityTypeConfiguration<Class>
             .HasForeignKey(e => e.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
         
-                // 作成日時 (TIMESTAMP)
+        // 作成日時 (TIMESTAMP)
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
