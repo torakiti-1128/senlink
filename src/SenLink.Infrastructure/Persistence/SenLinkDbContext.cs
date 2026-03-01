@@ -1,7 +1,9 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using SenLink.Domain.Modules.Activity.Entities;
 using SenLink.Domain.Modules.Auth.Entities;
 using SenLink.Domain.Modules.Job.Entities;
+using SenLink.Domain.Modules.Request.Entities;
 using SenLink.Domain.Modules.School.Entities;
 
 namespace SenLink.Infrastructure.Persistence;
@@ -40,6 +42,15 @@ public class SenLinkDbContext : DbContext
     public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
     public DbSet<Survey> Surveys => Set<Survey>();
     public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
+
+    // Activity Service Entities
+    public DbSet<Activity> Activities => Set<Activity>();
+    public DbSet<ActivityTodo> ActivityTodos => Set<ActivityTodo>();
+
+    // Request Service Entities
+    public DbSet<Request> Requests => Set<Request>();
+    public DbSet<RequestComment> RequestComments => Set<RequestComment>();
+    public DbSet<RequestAttachment> RequestAttachments => Set<RequestAttachment>();
 
     /// <summary>
     /// モデルを構成する
