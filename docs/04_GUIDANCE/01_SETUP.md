@@ -79,7 +79,7 @@ chmod +x scripts/*.sh
 既存のマイグレーション（設計図）を、各自のデータベースへ反映します。
 
 ```bash
-./scripts/update_database.sh
+./scripts/apply_migration.sh
 ```
 
 ### 補足
