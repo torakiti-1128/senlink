@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SenLink.Domain.Modules.Notification.Enums;
 
 namespace SenLink.Infrastructure.Modules.Notification.Persistence.Configurations;
 
@@ -32,7 +33,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Domain.Modules
         builder.Property(e => e.Type).IsRequired();
 
         // 既読ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.ReadStatus).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.ReadStatus).IsRequired().HasDefaultValue((ReadStatus)0);
 
         // 作成日時 (TIMESTAMP)
         builder.Property(x => x.CreatedAt)

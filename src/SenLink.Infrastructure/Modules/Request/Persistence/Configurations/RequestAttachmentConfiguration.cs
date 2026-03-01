@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SenLink.Domain.Modules.Request.Entities;
+using SenLink.Domain.Modules.Request.Enums;
 
 namespace SenLink.Infrastructure.Modules.Request.Persistence.Configurations;
 
@@ -21,7 +22,7 @@ public class RequestAttachmentConfiguration : IEntityTypeConfiguration<RequestAt
         builder.Property(e => e.FilePath).IsRequired().HasMaxLength(255);
 
         // ファイル形式 (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.FileType).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.FileType).IsRequired().HasDefaultValue((FileType)0);
 
         // 補足 (VARCHAR(255))
         builder.Property(e => e.Description).HasMaxLength(255);

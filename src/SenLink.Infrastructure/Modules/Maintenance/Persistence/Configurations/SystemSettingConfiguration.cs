@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SenLink.Domain.Modules.Maintenance.Entities;
+using SenLink.Domain.Modules.Maintenance.Enums;
 
 namespace SenLink.Infrastructure.Persistence.Configurations.Maintenance;
 
@@ -26,7 +27,7 @@ public class SystemSettingConfiguration : IEntityTypeConfiguration<SystemSetting
         builder.Property(e => e.Value).IsRequired().HasColumnType("text");
 
         // データ型 (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.ValueType).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.ValueType).IsRequired().HasDefaultValue((SettingValueType)0);
 
         // 説明 (VARCHAR(255))
         builder.Property(e => e.Description).HasMaxLength(255);

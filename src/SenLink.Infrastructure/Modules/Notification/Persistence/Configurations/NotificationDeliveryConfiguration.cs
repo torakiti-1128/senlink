@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SenLink.Domain.Modules.Notification.Entities;
+using SenLink.Domain.Modules.Notification.Enums;
 
 namespace SenLink.Infrastructure.Modules.Notification.Persistence.Configurations;
 
@@ -27,7 +28,7 @@ public class NotificationDeliveryConfiguration : IEntityTypeConfiguration<Notifi
         builder.Property(e => e.Channel).IsRequired();
 
         // 送信ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.Status).IsRequired().HasDefaultValue((DeliveryStatus)0);
 
         // 外部事業者のメッセージID (VARCHAR(128))
         builder.Property(e => e.ProviderMessageId).HasMaxLength(128);

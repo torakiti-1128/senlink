@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SenLink.Domain.Modules.Activity.Entities;
+using SenLink.Domain.Modules.Activity.Enums;
 
 namespace SenLink.Infrastructure.Modules.Activity.Persistence.Configurations;
 
@@ -30,7 +31,7 @@ public class ActivityTodoConfiguration : IEntityTypeConfiguration<ActivityTodo>
         builder.Property(e => e.StepOrder).IsRequired();
 
         // ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.Status).IsRequired().HasDefaultValue((ActivityTodoStatus)0);
 
         // 期限日 (DATE, NN)
         builder.Property(e => e.Deadline).IsRequired();

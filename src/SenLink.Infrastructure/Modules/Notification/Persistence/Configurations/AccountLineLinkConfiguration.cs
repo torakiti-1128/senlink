@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SenLink.Domain.Modules.Notification.Entities;
+using SenLink.Domain.Modules.Notification.Enums;
 
 namespace SenLink.Infrastructure.Modules.Notification.Persistence.Configurations;
 
@@ -28,7 +29,7 @@ public class AccountLineLinkConfiguration : IEntityTypeConfiguration<AccountLine
         builder.HasIndex(e => new { e.AccountId, e.LineUserId }).IsUnique();
 
         // 連携ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.Status).IsRequired().HasDefaultValue((LineLinkStatus)0);
 
         // 連携日時 (TIMESTAMP)
         builder.Property(e => e.LinkedAt);

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SenLink.Domain.Modules.Job.Enums;
 
 namespace SenLink.Infrastructure.Modules.Job.Persistence.Configurations;
 
@@ -38,7 +39,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Domain.Modules.Job.Enti
         builder.Property(e => e.ContactInfo).HasMaxLength(255);
 
         // 公開範囲 (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.PublishScope).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.PublishScope).IsRequired().HasDefaultValue((PublishScope)0);
 
         // 企業紹介／募集要項 (TEXT, NN)
         builder.Property(e => e.Content).IsRequired().HasColumnType("text");

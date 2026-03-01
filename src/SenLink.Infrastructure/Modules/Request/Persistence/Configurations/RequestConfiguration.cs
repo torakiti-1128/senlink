@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SenLink.Domain.Modules.Request.Enums;
 
 namespace SenLink.Infrastructure.Modules.Request.Persistence.Configurations;
 
@@ -23,7 +24,7 @@ public class RequestConfiguration : IEntityTypeConfiguration<Domain.Modules.Requ
         builder.Property(e => e.Type).IsRequired();
 
         // ステータス (SMALLINT, NN, Default: 0)
-        builder.Property(e => e.Status).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.Status).IsRequired().HasDefaultValue((RequestStatus)0);
 
         // 一覧表示用タイトル (VARCHAR(255), NN)
         builder.Property(e => e.Title).IsRequired().HasMaxLength(255);
