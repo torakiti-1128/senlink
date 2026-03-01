@@ -34,7 +34,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Domain.Modules
         // 既読ステータス (SMALLINT, NN, Default: 0)
         builder.Property(e => e.ReadStatus).IsRequired().HasDefaultValue(0);
 
-                // 作成日時 (TIMESTAMP)
+        // 作成日時 (TIMESTAMP)
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
