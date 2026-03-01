@@ -5,7 +5,7 @@ using SenLink.Domain.Modules.Auth.Entities;
 namespace SenLink.Infrastructure.Modules.Auth.Persistence.Configurations;
 
 /// <summary>
-/// LoginHistory エンティティの EF Core 設定
+/// ログイン履歴のテーブル構成定義
 /// </summary>
 public class LoginHistoryConfiguration : IEntityTypeConfiguration<LoginHistory>
 {

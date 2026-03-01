@@ -5,7 +5,7 @@ using SenLink.Domain.Modules.Auth.Entities;
 namespace SenLink.Infrastructure.Modules.Auth.Persistence.Configurations;
 
 /// <summary>
-/// Account エンティティの EF Core 設定
+/// アカウントのテーブル構成定義
 /// </summary>
 public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
@@ -34,7 +34,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
-            
+
         // 更新日時 (TIMESTAMP)
         builder.Property(x => x.UpdatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
