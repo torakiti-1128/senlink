@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using SenLink.Infrastructure.Persistence;
 
 // SenLink API アプリケーションのエントリーポイント
@@ -20,15 +21,18 @@ builder.Services.AddDbContext<SenLinkDbContext>(options =>
 // アプリケーションビルド
 var app = builder.Build();
 
+// リバースプロキシ環境でのクライアントIPとプロトコルの正確な取得
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 // 開発環境でのみSwagger UIを有効化
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// HTTP → HTTPS リダイレクト
-app.UseHttpsRedirection();
 
 // 認証・認可
 app.UseAuthorization();

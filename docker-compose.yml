@@ -1,10 +1,11 @@
 services:
   # 1. Reverse Proxy (Apache)
   apache:
-    image: httpd:alpine
+    build: 
+      context: ./infrastructure/apache
+      dockerfile: Dockerfile
     ports:
       - "8080:80"
-    # infrastructure/apache/httpd.conf ができたらマウントする
     depends_on:
       - core-api
 
