@@ -18,20 +18,27 @@ public class GlobalExceptionHandlerTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
-        var exception = exceptionType == typeof(Exception) 
-            ? new Exception("System Error") 
-            : (Exception)Activator.CreateInstance(exceptionType)!;
+        var responseStream = new MemoryStream();
+        context.Response.Body = responseStream;
+
+        // インスタンス化
+        Exception exception = exceptionType == typeof(ForbiddenException)
+            ? new ForbiddenException()
+            : new Exception("System Error");
 
         // Act
-        await _handler.TryHandleAsync(context, exception, CancellationToken.None);
+        var result = await _handler.TryHandleAsync(context, exception, CancellationToken.None);
 
         // Assert
+        Assert.True(result);
         Assert.Equal(expectedCode, context.Response.StatusCode);
         
-        context.Response.Body.Seek(0, SeekOrigin.Begin);
-        var responseText = new StreamReader(context.Response.Body).ReadToEnd();
-        var response = JsonSerializer.Deserialize<ApiErrorResponse>(responseText);
+        responseStream.Seek(0, SeekOrigin.Begin);
+        
+        var response = await JsonSerializer.DeserializeAsync<ApiErrorResponse>(
+            responseStream, 
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
         
         Assert.NotNull(response);
         Assert.False(response.Success);
