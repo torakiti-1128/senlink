@@ -12,7 +12,13 @@ public class GlobalExceptionHandlerTests
     }
 
     [Theory]
+    [InlineData(typeof(BadRequestException), 400, "BAD_REQUEST_ERROR")]
+    [InlineData(typeof(UnauthorizedException), 401, "UNAUTHORIZED_ERROR")]
     [InlineData(typeof(ForbiddenException), 403, "FORBIDDEN_ERROR")]
+    [InlineData(typeof(NotFoundException), 404, "NOT_FOUND_ERROR")]
+    [InlineData(typeof(ConflictException), 409, "CONFLICT_ERROR")]
+    [InlineData(typeof(ValidationException), 422, "VALIDATION_ERROR")]
+    [InlineData(typeof(TooManyRequestsException), 429, "TOO_MANY_REQUESTS_ERROR")]
     [InlineData(typeof(Exception), 500, "SERVER_ERROR")]
     public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Type exceptionType, int expectedCode, string expectedType)
     {
