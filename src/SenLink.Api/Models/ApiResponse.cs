@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace SenLink.Api.Models
 {
     /// <summary>
@@ -9,6 +11,14 @@ namespace SenLink.Api.Models
         public int Code { get; set; }
         public string Message { get; set; } = string.Empty;
         public string Operation { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// APIの成功レスポンスの共通形式（データあり）
+    /// </summary>
+    public class ApiResponse<T> : ApiResponse
+    {
+        public T? Data { get; set; }
     }
 
     /// <summary>
