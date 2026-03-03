@@ -64,7 +64,7 @@ namespace SenLink.Api.Middlewares
         /// <returns></returns>
         private string GetOperationName(HttpContext context)
         {
-            // ルート値からアクション名を取得、取れなければ path を整形
+            // ルート値からアクション名を取得
             var action = context.Request.RouteValues["action"]?.ToString();
             return action ?? context.Request.Path.Value?.Trim('/').Replace("/", "_") ?? "unknown_operation";
         }

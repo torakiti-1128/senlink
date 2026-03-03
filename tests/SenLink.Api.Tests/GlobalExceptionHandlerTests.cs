@@ -1,5 +1,8 @@
 namespace SenLink.Api.Tests;
 
+/// <summary>
+/// 共通例外ハンドラーのレスポンステスト
+/// </summary>
 public class GlobalExceptionHandlerTests
 {
     private readonly Mock<ILogger<GlobalExceptionHandler>> _loggerMock;
@@ -11,26 +14,27 @@ public class GlobalExceptionHandlerTests
         _handler = new GlobalExceptionHandler(_loggerMock.Object);
     }
 
+    // テストケース
+    public static IEnumerable<object[]> GetExceptionTestCases()
+    {
+        yield return new object[] { new BadRequestException(), 400, "BAD_REQUEST_ERROR" };
+        yield return new object[] { new UnauthorizedException(), 401, "UNAUTHORIZED_ERROR" };
+        yield return new object[] { new ForbiddenException(), 403, "FORBIDDEN_ERROR" };
+        yield return new object[] { new NotFoundException(), 404, "NOT_FOUND_ERROR" };
+        yield return new object[] { new ConflictException(), 409, "CONFLICT_ERROR" };
+        yield return new object[] { new ValidationException(new List<ValidationErrorDetail>()), 422, "VALIDATION_ERROR" };
+        yield return new object[] { new TooManyRequestsException(), 429, "TOO_MANY_REQUESTS_ERROR" };
+        yield return new object[] { new Exception("System Error"), 500, "SERVER_ERROR" };
+    }
+
     [Theory]
-    [InlineData(typeof(BadRequestException), 400, "BAD_REQUEST_ERROR")]
-    [InlineData(typeof(UnauthorizedException), 401, "UNAUTHORIZED_ERROR")]
-    [InlineData(typeof(ForbiddenException), 403, "FORBIDDEN_ERROR")]
-    [InlineData(typeof(NotFoundException), 404, "NOT_FOUND_ERROR")]
-    [InlineData(typeof(ConflictException), 409, "CONFLICT_ERROR")]
-    [InlineData(typeof(ValidationException), 422, "VALIDATION_ERROR")]
-    [InlineData(typeof(TooManyRequestsException), 429, "TOO_MANY_REQUESTS_ERROR")]
-    [InlineData(typeof(Exception), 500, "SERVER_ERROR")]
-    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Type exceptionType, int expectedCode, string expectedType)
+    [MemberData(nameof(GetExceptionTestCases))] 
+    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Exception exception, int expectedCode, string expectedType)
     {
         // Arrange
         var context = new DefaultHttpContext();
         var responseStream = new MemoryStream();
         context.Response.Body = responseStream;
-
-        // インスタンス化
-        Exception exception = exceptionType == typeof(ForbiddenException)
-            ? new ForbiddenException()
-            : new Exception("System Error");
 
         // Act
         var result = await _handler.TryHandleAsync(context, exception, CancellationToken.None);
