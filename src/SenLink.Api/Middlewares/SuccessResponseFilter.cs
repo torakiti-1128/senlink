@@ -4,6 +4,9 @@ using SenLink.Api.Models;
 
 namespace SenLink.Api.Middlewares
 {
+    /// <summary>
+    /// コントローラーのアクションが返す成功レスポンスを ApiResponse 形式にラップするフィルター
+    /// </summary>
     public class SuccessResponseFilter : IAsyncResultFilter
     {
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
