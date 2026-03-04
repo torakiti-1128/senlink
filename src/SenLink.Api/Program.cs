@@ -74,6 +74,9 @@ try
     // グローバル例外ハンドラーを有効化
     app.UseExceptionHandler();
 
+    // 学外のIPからのアクセスを制限するミドルウェア
+    app.UseMiddleware<CampusIpRestriction>();
+
     // 認証・認可
     app.UseAuthorization();
 
