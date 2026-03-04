@@ -58,7 +58,7 @@ namespace SenLink.UnitTests.Api.Middlewares
             var exception = await Assert.ThrowsAsync<ForbiddenException>(() => 
                 middleware.InvokeAsync(context, mockProvider.Object));
             
-            Assert.Equal("学外ネットワークからのアクセスは許可されていません。", exception.Message);
+            Assert.Equal("Not permitted to access from this IP address.", exception.Message);
         }
     }
 }
