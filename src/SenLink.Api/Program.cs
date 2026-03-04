@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SenLink.Api.Middlewares;
 using SenLink.Infrastructure.Persistence;
+using SenLink.Domain.Maintenance.Repositories;
+using SenLink.Infrastructure.Modules.Maintenance.Repositories;
+using SenLink.Service.Modules.Maintenance.Services;
+using SenLink.Service.Modules.Maintenance.Interfeces;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -40,6 +44,13 @@ try
             connectionString,
             b => b.MigrationsAssembly("SenLink.Infrastructure")
         ));
+
+    // リポジトリはDBコンテキストを使うため Scoped
+    builder.Services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+
+    // プロバイダー（キャッシュ）はアプリ全体で1つなので Singleton
+    builder.Services.AddSingleton<SystemSettingProvider>(); 
+    builder.Services.AddSingleton<ISystemSettingProvider>(sp => sp.GetRequiredService<SystemSettingProvider>());
 
     // アプリケーションビルド
     var app = builder.Build();
