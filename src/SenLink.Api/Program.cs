@@ -71,6 +71,9 @@ try
         app.UseSwaggerUI();
     }
 
+    // Correlation ID をリクエストごとに生成し、ログに付与するミドルウェア
+    app.UseMiddleware<CorrelationIdMiddleware>();
+
     // グローバル例外ハンドラーを有効化
     app.UseExceptionHandler();
 
