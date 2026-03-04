@@ -34,7 +34,7 @@ namespace SenLink.Api.Middlewares
             var (statusCode, message, errorType, details) = exception switch
             {
                 SenLinkException ex => (ex.StatusCode, ex.Message, ex.ErrorType, ex.Errors),
-                _ => (StatusCodes.Status500InternalServerError, "サーバー内部エラーが発生しました。", "SERVER_ERROR", null)
+                _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.", "SERVER_ERROR", null)
             };
 
             // APIエラー形式でレスポンスを構築

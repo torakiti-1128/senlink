@@ -25,7 +25,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class ForbiddenException : SenLinkException
     {
-        public ForbiddenException(string message = "アクセス権限がありません。") 
+        public ForbiddenException(string message = "Not allowed to access this resource.") 
             : base(StatusCodes.Status403Forbidden, message, "FORBIDDEN_ERROR") { }
     }
 
@@ -35,7 +35,7 @@ namespace SenLink.Api.Middlewares
     public class ValidationException : SenLinkException
     {
         public ValidationException(List<ValidationErrorDetail> errors) 
-            : base(StatusCodes.Status422UnprocessableEntity, "バリデーションエラーが発生しました。", "VALIDATION_ERROR", errors) { }
+            : base(StatusCodes.Status422UnprocessableEntity, "Validation failed.", "VALIDATION_ERROR", errors) { }
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class UnauthorizedException : SenLinkException
     {
-        public UnauthorizedException(string message = "認証が必要です。") 
+        public UnauthorizedException(string message = "Authentication is required.") 
             : base(StatusCodes.Status401Unauthorized, message, "UNAUTHORIZED_ERROR") { }
     }
 
@@ -52,7 +52,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class NotFoundException : SenLinkException
     {
-        public NotFoundException(string message = "指定されたリソースが見つかりません。") 
+        public NotFoundException(string message = "The requested resource was not found.") 
             : base(StatusCodes.Status404NotFound, message, "NOT_FOUND_ERROR") { }
     }
 
@@ -61,7 +61,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class ConflictException : SenLinkException
     {
-        public ConflictException(string message = "データが競合しています。") 
+        public ConflictException(string message = "The requested resource conflicts with an existing one.") 
             : base(StatusCodes.Status409Conflict, message, "CONFLICT_ERROR") { }
     }
 
@@ -70,7 +70,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class BadRequestException : SenLinkException
     {
-        public BadRequestException(string message = "不正なリクエストです。") 
+        public BadRequestException(string message = "The request is invalid.") 
             : base(StatusCodes.Status400BadRequest, message, "BAD_REQUEST_ERROR") { }
     }
 
@@ -79,7 +79,7 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class TooManyRequestsException : SenLinkException
     {
-        public TooManyRequestsException(string message = "リクエストが多すぎます。しばらく時間を置いてください。") 
+        public TooManyRequestsException(string message = "The request is too frequent. Please wait a moment.") 
             : base(StatusCodes.Status429TooManyRequests, message, "TOO_MANY_REQUESTS_ERROR") { }
     }
 }
