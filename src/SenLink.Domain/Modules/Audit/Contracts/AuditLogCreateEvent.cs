@@ -10,5 +10,6 @@ public record AuditLogCreatedEvent(
     string Method, // "CREATE", "UPDATE", "DELETE" など
     Dictionary<string, object>? OldValues,
     Dictionary<string, object>? NewValues,
-    string? IpAddress
+    string? IpAddress,
+    DateTime CreatedAt
 );
