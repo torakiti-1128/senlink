@@ -16,6 +16,7 @@ public class ClassTeacherConfiguration : IEntityTypeConfiguration<ClassTeacher>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // クラスID (FK, NN)
         builder.Property(e => e.ClassId).IsRequired();

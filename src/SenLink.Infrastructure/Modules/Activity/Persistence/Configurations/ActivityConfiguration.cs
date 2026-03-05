@@ -16,6 +16,7 @@ public class ActivityConfiguration : IEntityTypeConfiguration<Domain.Modules.Act
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 求人ID (NOFK, NN, jobs.id)
         builder.Property(e => e.JobId).IsRequired();

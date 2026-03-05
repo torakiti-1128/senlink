@@ -1,1 +1,16 @@
 global using Xunit;
+global using Moq;
+global using System;
+global using System.Collections.Generic;
+global using System.IO;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using System.Text.Json;
+global using System.Net;
+global using Microsoft.Extensions.Logging.Abstractions;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Abstractions;
+global using Microsoft.AspNetCore.Mvc.Filters;
+global using Microsoft.AspNetCore.Routing;

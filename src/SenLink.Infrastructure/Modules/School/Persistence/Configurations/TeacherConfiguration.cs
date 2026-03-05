@@ -16,6 +16,7 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // アカウントID (NOFK, UQ, NN) 外部キーは張らずにユニーク制約のみ付与
         builder.Property(e => e.AccountId).IsRequired();

@@ -16,6 +16,7 @@ public class ClassConfiguration : IEntityTypeConfiguration<Class>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 学科ID (FK, NN)
         builder.Property(e => e.DepartmentId).IsRequired();

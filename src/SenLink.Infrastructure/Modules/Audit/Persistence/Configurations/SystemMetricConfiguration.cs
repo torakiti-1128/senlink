@@ -17,6 +17,7 @@ public class SystemMetricConfiguration : IEntityTypeConfiguration<SystemMetric>
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // コンポーネント (VARCHAR(50), NN)
         builder.Property(e => e.Component).IsRequired().HasMaxLength(50);

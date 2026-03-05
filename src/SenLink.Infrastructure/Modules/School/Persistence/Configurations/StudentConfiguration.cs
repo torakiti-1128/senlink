@@ -16,6 +16,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // アカウントID (NOFK, UQ, NN)
         builder.Property(e => e.AccountId).IsRequired();

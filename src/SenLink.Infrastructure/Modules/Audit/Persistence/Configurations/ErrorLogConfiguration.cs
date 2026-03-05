@@ -17,6 +17,7 @@ public class ErrorLogConfiguration : IEntityTypeConfiguration<ErrorLog>
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 発生元サービス (VARCHAR(50), NN)
         builder.Property(e => e.ServiceName).IsRequired().HasMaxLength(50);

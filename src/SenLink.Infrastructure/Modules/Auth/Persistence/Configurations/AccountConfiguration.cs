@@ -15,7 +15,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.ToTable("accounts");
 
         // 主キー
-        builder.HasKey(x => x.Id);
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // メールアドレス (VARCHAR(255), NN, UNIQUE)
         builder.Property(x => x.Email).IsRequired().HasMaxLength(255);

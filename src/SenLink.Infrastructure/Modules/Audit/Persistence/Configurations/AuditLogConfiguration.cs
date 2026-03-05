@@ -17,6 +17,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 操作者ID (NOFK, NN, accounts.id)
         builder.Property(e => e.ActorId).IsRequired();
