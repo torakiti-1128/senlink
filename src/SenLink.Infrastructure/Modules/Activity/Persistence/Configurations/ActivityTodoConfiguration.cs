@@ -17,6 +17,7 @@ public class ActivityTodoConfiguration : IEntityTypeConfiguration<ActivityTodo>
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 就活ID (FK, NN)
         builder.Property(e => e.ActivityId).IsRequired();

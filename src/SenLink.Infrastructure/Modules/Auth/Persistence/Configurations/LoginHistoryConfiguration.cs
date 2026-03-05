@@ -15,7 +15,8 @@ public class LoginHistoryConfiguration : IEntityTypeConfiguration<LoginHistory>
         builder.ToTable("login_histories");
 
         // 主キー
-        builder.HasKey(x => x.Id);
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // アカウントID (FK, NN)
         builder.Property(x => x.AccountId)

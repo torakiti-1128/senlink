@@ -16,6 +16,7 @@ public class TodoStepConfiguration : IEntityTypeConfiguration<TodoStep>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 親テンプレートID (FK, NN)
         builder.Property(e => e.TemplateId).IsRequired();

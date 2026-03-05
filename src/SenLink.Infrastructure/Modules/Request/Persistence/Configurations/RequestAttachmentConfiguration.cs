@@ -14,6 +14,7 @@ public class RequestAttachmentConfiguration : IEntityTypeConfiguration<RequestAt
     {
         builder.ToTable("request_attachments");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 申請ID (FK, NN)
         builder.Property(e => e.RequestId).IsRequired();

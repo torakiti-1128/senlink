@@ -16,6 +16,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 企業名 (VARCHAR(255), NN)
         builder.Property(e => e.Name).IsRequired().HasMaxLength(255);

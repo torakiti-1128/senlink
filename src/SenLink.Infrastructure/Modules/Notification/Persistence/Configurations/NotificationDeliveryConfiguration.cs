@@ -17,6 +17,7 @@ public class NotificationDeliveryConfiguration : IEntityTypeConfiguration<Notifi
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 通知ID (FK, NN)
         builder.Property(e => e.NotificationId).IsRequired();

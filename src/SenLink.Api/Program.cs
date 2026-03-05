@@ -100,7 +100,7 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
         
-        // 初期データの流し込み（Development環境のみ推奨）
+        // 初期データの流し込み
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
         try

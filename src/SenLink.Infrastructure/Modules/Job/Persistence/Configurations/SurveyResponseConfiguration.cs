@@ -16,6 +16,7 @@ public class SurveyResponseConfiguration : IEntityTypeConfiguration<SurveyRespon
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // アンケート定義ID (FK, NN)
         builder.Property(e => e.SurveyId).IsRequired();
