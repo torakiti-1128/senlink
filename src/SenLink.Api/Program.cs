@@ -12,6 +12,7 @@ using SenLink.Service.Modules.Maintenance.Interfeces;
 using SenLink.Api.Filters;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Modules.Auth.Repositories;
+using SenLink.Infrastructure.Persistence.Seeders;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -98,6 +99,20 @@ try
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        
+        // 初期データの流し込み（Development環境のみ推奨）
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<SenLinkDbContext>();
+            await DbInitializer.SeedAsync(context);
+            Log.Information("Database seeding completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while seeding the database.");
+        }
     }
 
     // Correlation ID をリクエストごとに生成し、ログに付与するミドルウェア
