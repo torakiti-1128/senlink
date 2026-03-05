@@ -1,3 +1,6 @@
+global using SenLink.Api.Middlewares;
+global using SenLink.Api.Models;
+
 namespace SenLink.Api.Tests;
 
 public class SuccessResponseFilterTests

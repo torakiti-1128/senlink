@@ -14,6 +14,3 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Abstractions;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Routing;
-global using SenLink.Api.Middlewares;
-global using SenLink.Api.Models;
-global using SenLink.Service.Modules.Maintenance.Interfeces;
