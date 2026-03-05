@@ -7,8 +7,8 @@ builder.Services.AddHostedService<Worker>();
 // MassTransit の設定 (Consumer側)
 builder.Services.AddMassTransit(x =>
 {
-    // TODO: 次のステップでここに Consumer（受信クラス）を登録します
-    // x.AddConsumer<AuditLogConsumer>();
+    // Consumerの登録
+    x.AddConsumer<AuditLogConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
