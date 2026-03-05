@@ -73,6 +73,9 @@ try
     builder.Services.AddSingleton<SystemSettingProvider>(); 
     builder.Services.AddSingleton<ISystemSettingProvider>(sp => sp.GetRequiredService<SystemSettingProvider>());
 
+    // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
+    builder.Services.AddIdentityServices(builder.Configuration);
+
     // アプリケーションビルド
     var app = builder.Build();
 
