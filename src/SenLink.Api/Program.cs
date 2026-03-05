@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using SenLink.Api.Middlewares;
 using SenLink.Infrastructure.Persistence;
 using SenLink.Domain.Maintenance.Repositories;
 using SenLink.Infrastructure.Modules.Maintenance.Repositories;
 using SenLink.Service.Modules.Maintenance.Services;
 using SenLink.Service.Modules.Maintenance.Interfeces;
+using SenLink.Api.Filters;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -26,6 +29,21 @@ try
     // サービス登録
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    // バリデーションエラーを統一された形式で返すフィルター
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<ValidationFilter>();
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // ASP.NET Core標準の自動バリデーションレスポンスを抑制し、自作フィルターを優先させる
+        options.SuppressModelStateInvalidFilter = true;
+    });
+
+    // FluentValidationの有効化（Service層などにあるValidatorを自動スキャン）
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
     // 成功レスポンスを自動で ApiResponse に包むフィルターを登録
     builder.Services.AddControllers(options =>
