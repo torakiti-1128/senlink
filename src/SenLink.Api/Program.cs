@@ -13,6 +13,7 @@ using SenLink.Api.Filters;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Persistence.Seeders;
+using MassTransit;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -81,6 +82,25 @@ try
 
     // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
     builder.Services.AddIdentityServices(builder.Configuration);
+
+    // RabbitMQを利用したメッセージングのセットアップ
+    builder.Services.AddMassTransit(x =>
+    {
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            var rabbitMqHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
+            var rabbitMqUser = builder.Configuration["RabbitMq:Username"] ?? "guest";
+            var rabbitMqPass = builder.Configuration["RabbitMq:Password"] ?? "guest";
+
+            cfg.Host(rabbitMqHost, "/", h =>
+            {
+                h.Username(rabbitMqUser);
+                h.Password(rabbitMqPass);
+            });
+
+            cfg.ConfigureEndpoints(context);
+        });
+    });
 
     // アプリケーションビルド
     var app = builder.Build();
