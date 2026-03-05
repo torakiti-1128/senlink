@@ -45,6 +45,9 @@ try
             b => b.MigrationsAssembly("SenLink.Infrastructure")
         ));
 
+    // ヘルスチェックにDBコンテキストの状態を追加
+    builder.Services.AddHealthChecks().AddDbContextCheck<SenLinkDbContext>("Database");
+
     // リポジトリはDBコンテキストを使うため Scoped
     builder.Services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
 
@@ -85,6 +88,9 @@ try
 
     // コントローラーのURLマッピング
     app.MapControllers();
+
+    // ヘルスチェックのエンドポイントを公開
+    app.MapHealthChecks("/health");
 
     // アプリケーション起動
     app.Run();
