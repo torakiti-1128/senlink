@@ -21,4 +21,24 @@ public class Account : BaseEntity
 
     // 論理削除
     public DateTime? DeletedAt { get; set; }
+
+    /// <summary>
+    /// パスワードの設定
+    /// </summary>
+    /// <param name="rawPassword">平文のパスワード</param>
+    public void SetPassword(string rawPassword)
+    {
+        if (string.IsNullOrWhiteSpace(rawPassword)) throw new ArgumentException("Password cannot be empty.");
+        Password = BCrypt.Net.BCrypt.HashPassword(rawPassword);
+    }
+
+    /// <summary>
+    /// パスワードの検証
+    /// </summary>
+    /// <param name="rawPassword">平文のパスワード</param>
+    /// <returns>パスワードが一致する場合は true、それ以外は false</returns>
+    public bool VerifyPassword(string rawPassword)
+    {
+        return BCrypt.Net.BCrypt.Verify(rawPassword, Password);
+    }
 }
