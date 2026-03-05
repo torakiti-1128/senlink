@@ -10,6 +10,8 @@ using SenLink.Infrastructure.Modules.Maintenance.Repositories;
 using SenLink.Service.Modules.Maintenance.Services;
 using SenLink.Service.Modules.Maintenance.Interfeces;
 using SenLink.Api.Filters;
+using SenLink.Domain.Modules.Auth.Repositories;
+using SenLink.Infrastructure.Modules.Auth.Repositories;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -72,6 +74,9 @@ try
     // プロバイダー（キャッシュ）はアプリ全体で1つなので Singleton
     builder.Services.AddSingleton<SystemSettingProvider>(); 
     builder.Services.AddSingleton<ISystemSettingProvider>(sp => sp.GetRequiredService<SystemSettingProvider>());
+
+    // 認証リポジトリの登録
+    builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
     // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
     builder.Services.AddIdentityServices(builder.Configuration);
