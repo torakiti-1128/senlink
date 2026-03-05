@@ -2,6 +2,6 @@ namespace SenLink.Service.Modules.Auth.DTOs;
 public record AuthResponse(
     string Token, 
     DateTime ExpiresAt, 
-    Guid UserId, 
+    long UserId, 
     string Email, 
     string Role);

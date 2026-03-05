@@ -27,7 +27,7 @@ public class AccountRepository(SenLinkDbContext context) : IAccountRepository
     /// </summary>
     /// <param name="id">アカウントID</param>
     /// <returns>一致するアカウント情報</returns>
-    public async Task<Account?> GetByIdAsync(Guid id)
+    public async Task<Account?> GetByIdAsync(long id)
     {
         return await context.Set<Account>().FindAsync(id);
     }

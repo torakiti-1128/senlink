@@ -6,7 +6,7 @@ namespace SenLink.Domain.Common;
 public abstract class BaseEntity
 {
     // 主キー
-    public Guid Id { get; set; }
+    public long Id { get; set; }
 
     // 作成日時
     public DateTime CreatedAt { get; set; }
