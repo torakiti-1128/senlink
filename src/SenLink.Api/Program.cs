@@ -79,6 +79,9 @@ try
     // 認証リポジトリの登録
     builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
+    // 認証サービスの登録
+    builder.Services.AddScoped<IAuthService, AuthService>();
+
     // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
     builder.Services.AddIdentityServices(builder.Configuration);
 
