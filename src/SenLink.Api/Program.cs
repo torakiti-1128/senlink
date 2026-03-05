@@ -13,6 +13,8 @@ using SenLink.Api.Filters;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Persistence.Seeders;
+using SenLink.Service.Modules.Auth.Interfaces;
+using SenLink.Service.Modules.Auth.Services;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -77,7 +79,10 @@ try
     builder.Services.AddSingleton<ISystemSettingProvider>(sp => sp.GetRequiredService<SystemSettingProvider>());
 
     // 認証リポジトリの登録
-    builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+    builder.Services.AddScoped<IAccountRepository, AccountRepository>();;
+
+    // トークンサービスの登録
+    builder.Services.AddScoped<ITokenService, TokenService>();
 
     // 認証サービスの登録
     builder.Services.AddScoped<IAuthService, AuthService>();
