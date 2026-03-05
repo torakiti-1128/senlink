@@ -16,6 +16,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 学科名 (VARCHAR(100), NN)
         builder.Property(e => e.Name)

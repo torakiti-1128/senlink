@@ -16,6 +16,7 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // タグ名 (VARCHAR(50), NN)
         builder.Property(e => e.Name).IsRequired().HasMaxLength(50);

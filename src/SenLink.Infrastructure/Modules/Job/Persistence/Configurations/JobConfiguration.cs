@@ -13,6 +13,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Domain.Modules.Job.Enti
     {
         builder.ToTable("jobs");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 企業ID (FK, NN)
         builder.Property(e => e.CompanyId).IsRequired();

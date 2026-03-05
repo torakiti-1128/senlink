@@ -16,6 +16,7 @@ public class TodoTemplateConfiguration : IEntityTypeConfiguration<TodoTemplate>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // テンプレート名 (VARCHAR(100), NN)
         builder.Property(e => e.Name).IsRequired().HasMaxLength(100);

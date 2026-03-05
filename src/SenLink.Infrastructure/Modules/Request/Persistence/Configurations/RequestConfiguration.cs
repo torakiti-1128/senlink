@@ -14,6 +14,7 @@ public class RequestConfiguration : IEntityTypeConfiguration<Domain.Modules.Requ
     {
         builder.ToTable("requests");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 申請者ID (NOFK, NN, accounts.id)
         builder.Property(e => e.RequesterAccountId).IsRequired();

@@ -16,6 +16,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Domain.Modules
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 受信者ID (NOFK, NN)
         builder.Property(e => e.RecipientAccountId).IsRequired();

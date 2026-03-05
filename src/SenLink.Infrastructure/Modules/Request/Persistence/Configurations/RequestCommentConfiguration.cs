@@ -13,6 +13,7 @@ public class RequestCommentConfiguration : IEntityTypeConfiguration<RequestComme
     {
         builder.ToTable("request_comments");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 申請ID (FK, NN)
         builder.Property(e => e.RequestId).IsRequired();

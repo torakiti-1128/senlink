@@ -18,6 +18,7 @@ public class SystemSettingConfiguration : IEntityTypeConfiguration<SystemSetting
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 設定キー (VARCHAR(50), UQ, NN)
         builder.Property(e => e.Key).IsRequired().HasMaxLength(50);

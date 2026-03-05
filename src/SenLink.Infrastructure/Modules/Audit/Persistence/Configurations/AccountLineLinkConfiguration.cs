@@ -18,6 +18,7 @@ public class AccountLineLinkConfiguration : IEntityTypeConfiguration<AccountLine
 
         // 主キー
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // アカウントID (NOFK, NN, UQ, accounts.id)
         builder.Property(e => e.AccountId).IsRequired();

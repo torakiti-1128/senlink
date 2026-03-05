@@ -16,6 +16,7 @@ public class SurveyConfiguration : IEntityTypeConfiguration<Survey>
 
         // プライマリキー (PK)
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         // 求人ID (FK, NN)
         builder.Property(e => e.JobId).IsRequired();

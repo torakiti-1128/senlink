@@ -28,7 +28,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_account_line_links", x => x.Id);
+                    table.PrimaryKey("PK_account_line_links", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,7 +47,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_accounts", x => x.Id);
+                    table.PrimaryKey("PK_accounts", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,7 +65,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_activities", x => x.Id);
+                    table.PrimaryKey("PK_activities", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,7 +85,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_audit_logs", x => x.Id);
+                    table.PrimaryKey("PK_audit_logs", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,7 +102,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_companies", x => x.Id);
+                    table.PrimaryKey("PK_companies", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -118,7 +118,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_departments", x => x.Id);
+                    table.PrimaryKey("PK_departments", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -139,7 +139,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_error_logs", x => x.Id);
+                    table.PrimaryKey("PK_error_logs", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -177,7 +177,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_notifications", x => x.Id);
+                    table.PrimaryKey("PK_notifications", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,7 +199,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_requests", x => x.Id);
+                    table.PrimaryKey("PK_requests", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -219,7 +219,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_system_metrics", x => x.Id);
+                    table.PrimaryKey("PK_system_metrics", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -239,7 +239,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_system_settings", x => x.Id);
+                    table.PrimaryKey("PK_system_settings", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -255,7 +255,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tags", x => x.Id);
+                    table.PrimaryKey("PK_tags", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -275,7 +275,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_teachers", x => x.Id);
+                    table.PrimaryKey("PK_teachers", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,7 +291,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_todo_templates", x => x.Id);
+                    table.PrimaryKey("PK_todo_templates", e => e.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -309,7 +309,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_login_histories", x => x.Id);
+                    table.PrimaryKey("PK_login_histories", e => e.Id);
                     table.ForeignKey(
                         name: "FK_login_histories_accounts_AccountId",
                         column: x => x.AccountId,
@@ -336,7 +336,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_activity_todos", x => x.Id);
+                    table.PrimaryKey("PK_activity_todos", e => e.Id);
                     table.ForeignKey(
                         name: "FK_activity_todos_activities_ActivityId",
                         column: x => x.ActivityId,
@@ -360,7 +360,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_classes", x => x.Id);
+                    table.PrimaryKey("PK_classes", e => e.Id);
                     table.ForeignKey(
                         name: "FK_classes_departments_DepartmentId",
                         column: x => x.DepartmentId,
@@ -389,7 +389,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_notification_deliveries", x => x.Id);
+                    table.PrimaryKey("PK_notification_deliveries", e => e.Id);
                     table.ForeignKey(
                         name: "FK_notification_deliveries_notifications_NotificationId",
                         column: x => x.NotificationId,
@@ -413,7 +413,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_request_attachments", x => x.Id);
+                    table.PrimaryKey("PK_request_attachments", e => e.Id);
                     table.ForeignKey(
                         name: "FK_request_attachments_requests_RequestId",
                         column: x => x.RequestId,
@@ -437,7 +437,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_request_comments", x => x.Id);
+                    table.PrimaryKey("PK_request_comments", e => e.Id);
                     table.ForeignKey(
                         name: "FK_request_comments_requests_RequestId",
                         column: x => x.RequestId,
@@ -474,7 +474,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_jobs", x => x.Id);
+                    table.PrimaryKey("PK_jobs", e => e.Id);
                     table.ForeignKey(
                         name: "FK_jobs_companies_CompanyId",
                         column: x => x.CompanyId,
@@ -506,7 +506,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_todo_steps", x => x.Id);
+                    table.PrimaryKey("PK_todo_steps", e => e.Id);
                     table.ForeignKey(
                         name: "FK_todo_steps_todo_templates_TemplateId",
                         column: x => x.TemplateId,
@@ -529,7 +529,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_class_teachers", x => x.Id);
+                    table.PrimaryKey("PK_class_teachers", e => e.Id);
                     table.ForeignKey(
                         name: "FK_class_teachers_classes_ClassId",
                         column: x => x.ClassId,
@@ -565,7 +565,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_students", x => x.Id);
+                    table.PrimaryKey("PK_students", e => e.Id);
                     table.ForeignKey(
                         name: "FK_students_classes_ClassId",
                         column: x => x.ClassId,
@@ -587,7 +587,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_bookmarks", x => x.Id);
+                    table.PrimaryKey("PK_bookmarks", e => e.Id);
                     table.ForeignKey(
                         name: "FK_bookmarks_jobs_JobId",
                         column: x => x.JobId,
@@ -610,7 +610,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_job_recommendations", x => x.Id);
+                    table.PrimaryKey("PK_job_recommendations", e => e.Id);
                     table.ForeignKey(
                         name: "FK_job_recommendations_jobs_JobId",
                         column: x => x.JobId,
@@ -632,7 +632,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_job_tags", x => x.Id);
+                    table.PrimaryKey("PK_job_tags", e => e.Id);
                     table.ForeignKey(
                         name: "FK_job_tags_jobs_JobId",
                         column: x => x.JobId,
@@ -660,7 +660,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_job_target_classes", x => x.Id);
+                    table.PrimaryKey("PK_job_target_classes", e => e.Id);
                     table.ForeignKey(
                         name: "FK_job_target_classes_jobs_JobId",
                         column: x => x.JobId,
@@ -682,7 +682,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_job_target_students", x => x.Id);
+                    table.PrimaryKey("PK_job_target_students", e => e.Id);
                     table.ForeignKey(
                         name: "FK_job_target_students_jobs_JobId",
                         column: x => x.JobId,
@@ -705,7 +705,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_surveys", x => x.Id);
+                    table.PrimaryKey("PK_surveys", e => e.Id);
                     table.ForeignKey(
                         name: "FK_surveys_jobs_JobId",
                         column: x => x.JobId,
@@ -728,7 +728,7 @@ namespace SenLink.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_survey_responses", x => x.Id);
+                    table.PrimaryKey("PK_survey_responses", e => e.Id);
                     table.ForeignKey(
                         name: "FK_survey_responses_surveys_SurveyId",
                         column: x => x.SurveyId,
