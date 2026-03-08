@@ -6,8 +6,6 @@ using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Modules.Auth.Repositories;
 using SenLink.Domain.Maintenance.Repositories;
 using SenLink.Infrastructure.Modules.Maintenance.Repositories;
-using SenLink.Domain.Modules.Audit.Repositories;
-using SenLink.Infrastructure.Modules.Audit.Repositories;
 
 namespace SenLink.Infrastructure;
 
@@ -23,10 +21,6 @@ public static class DependencyInjection
         // Auth
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IOneTimePasswordRepository, OneTimePasswordRepository>();
-
-        // Audit
-        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-        services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
 
         // Maintenance
         services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.*" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.24" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.24" />
@@ -33,6 +34,7 @@
     <ProjectReference Include="..\SenLink.Service\SenLink.Service.csproj" />
     <ProjectReference Include="..\SenLink.Infrastructure\SenLink.Infrastructure.csproj" />
     <ProjectReference Include="..\SenLink.Domain\SenLink.Domain.csproj" />
+    <ProjectReference Include="..\SenLink.Shared\SenLink.Shared.csproj" />
   </ItemGroup>
 
 </Project>
