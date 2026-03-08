@@ -77,7 +77,7 @@ public class GlobalExceptionHandlerTests
 
     [Theory]
     [MemberData(nameof(GetExceptionTestCases))] 
-    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Exception exception, int expectedCode, string expectedType)
+    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Exception exception, int expectedCode)
     {
         // Arrange
         var context = new DefaultHttpContext();
