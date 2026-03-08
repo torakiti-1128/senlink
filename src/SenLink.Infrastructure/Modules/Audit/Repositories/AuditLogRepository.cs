@@ -1,5 +1,8 @@
 using SenLink.Domain.Modules.Audit.Entities;
+using SenLink.Domain.Modules.Audit.Repositories;
 using SenLink.Infrastructure.Persistence;
+
+namespace SenLink.Infrastructure.Modules.Audit.Repositories;
 
 /// <summary>
 /// 監査ログリポジトリ
