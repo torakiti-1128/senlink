@@ -1,18 +1,15 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SenLink.Api.Middlewares;
 using SenLink.Infrastructure.Persistence;
-using SenLink.Domain.Maintenance.Repositories;
-using SenLink.Infrastructure.Modules.Maintenance.Repositories;
+using SenLink.Infrastructure.Persistence.Seeders;
+using SenLink.Infrastructure;
+using SenLink.Shared;
+using SenLink.Api.Filters;
 using SenLink.Service.Modules.Maintenance.Services;
 using SenLink.Service.Modules.Maintenance.Interfeces;
-using SenLink.Api.Filters;
-using SenLink.Domain.Modules.Auth.Repositories;
-using SenLink.Infrastructure.Modules.Auth.Repositories;
-using SenLink.Infrastructure.Persistence.Seeders;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -58,26 +55,18 @@ try
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 
-    // DB接続設定
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<SenLinkDbContext>(options =>
-        options.UseNpgsql(
-            connectionString,
-            b => b.MigrationsAssembly("SenLink.Infrastructure")
-        ));
+    // Infrastructure 層のサービスを一括登録 (DB, Repositories)
+    builder.Services.AddInfrastructure(builder.Configuration);
+
+    // Shared 層の共通設定 (RabbitMQ) を適用
+    builder.Services.AddSharedMessaging(builder.Configuration);
 
     // ヘルスチェックにDBコンテキストの状態を追加
     builder.Services.AddHealthChecks().AddDbContextCheck<SenLinkDbContext>("Database");
 
-    // リポジトリはDBコンテキストを使うため Scoped
-    builder.Services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
-
     // プロバイダー（キャッシュ）はアプリ全体で1つなので Singleton
     builder.Services.AddSingleton<SystemSettingProvider>(); 
     builder.Services.AddSingleton<ISystemSettingProvider>(sp => sp.GetRequiredService<SystemSettingProvider>());
-
-    // 認証リポジトリの登録
-    builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
     // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
     builder.Services.AddIdentityServices(builder.Configuration);
