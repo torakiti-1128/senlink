@@ -31,5 +31,5 @@ public interface IAccountRepository
     /// 更新
     /// </summary>
     /// <param name="account">アカウント情報</param>
-    void Update(Account account);
+    Task UpdateAsync(Account account);
 }
