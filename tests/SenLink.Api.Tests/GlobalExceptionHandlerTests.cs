@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SenLink.Api.Middlewares;
@@ -17,13 +18,28 @@ public class GlobalExceptionHandlerTests
 {
     private readonly Mock<ILogger<GlobalExceptionHandler>> _loggerMock;
     private readonly Mock<IPublishEndpoint> _publishEndpointMock;
+    private readonly Mock<IServiceProvider> _serviceProviderMock;
     private readonly GlobalExceptionHandler _handler;
 
     public GlobalExceptionHandlerTests()
     {
         _loggerMock = new Mock<ILogger<GlobalExceptionHandler>>();
         _publishEndpointMock = new Mock<IPublishEndpoint>();
-        _handler = new GlobalExceptionHandler(_loggerMock.Object, _publishEndpointMock.Object);
+        _serviceProviderMock = new Mock<IServiceProvider>();
+
+        // IServiceProvider.CreateScope() のモック設定
+        var serviceScopeMock = new Mock<IServiceScope>();
+        serviceScopeMock.Setup(x => x.ServiceProvider).Returns(_serviceProviderMock.Object);
+        
+        var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
+        serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(serviceScopeMock.Object);
+        
+        _serviceProviderMock.Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(serviceScopeFactoryMock.Object);
+        _serviceProviderMock.Setup(x => x.GetService(typeof(IPublishEndpoint)))
+            .Returns(_publishEndpointMock.Object);
+
+        _handler = new GlobalExceptionHandler(_loggerMock.Object, _serviceProviderMock.Object);
     }
 
     [Fact]
@@ -43,7 +59,6 @@ public class GlobalExceptionHandlerTests
         await _handler.TryHandleAsync(context, exception, CancellationToken.None);
 
         // Assert
-        // ErrorLogCreatedEvent がパブリッシュされたことを検証
         _publishEndpointMock.Verify(
             x => x.Publish(
                 It.Is<ErrorLogCreatedEvent>(e => 
@@ -54,7 +69,6 @@ public class GlobalExceptionHandlerTests
             Times.Once);
     }
 
-    // 他の既存テストケース（レスポンス形式の確認など）
     public static IEnumerable<object[]> GetExceptionTestCases()
     {
         yield return new object[] { new BadRequestException(), 400, "BAD_REQUEST_ERROR" };

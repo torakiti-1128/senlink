@@ -13,22 +13,15 @@ namespace SenLink.Api.Middlewares
     /// </summary>
     public class GlobalExceptionHandler : IExceptionHandler
     {
-        // ロガー
         private readonly ILogger<GlobalExceptionHandler> _logger;
-        
-        // メッセージ送信エンドポイント
-        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IServiceProvider _serviceProvider;
 
-        // コンストラクタ
-        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IPublishEndpoint publishEndpoint)
+        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IServiceProvider serviceProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        /// <summary>
-        /// 例外を処理し適切なHTTPレスポンスを返す
-        /// </summary>
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
@@ -42,10 +35,13 @@ namespace SenLink.Api.Middlewares
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.", "SERVER_ERROR", null)
             };
 
-            // ErrorLogを作成してRabbitMQにパブリッシュ（非同期ログ記録）
-            await PublishErrorLogEvent(httpContext, exception, cancellationToken);
+            // スコープを作成して IPublishEndpoint を取得する
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+                await PublishErrorLogEvent(httpContext, publishEndpoint, exception, cancellationToken);
+            }
 
-            // APIエラー形式でレスポンスを構築
             var response = new ApiErrorResponse
             {
                 Success = false,
@@ -65,10 +61,7 @@ namespace SenLink.Api.Middlewares
             return true;
         }
 
-        /// <summary>
-        /// エラー情報をRabbitMQに送信する
-        /// </summary>
-        private async Task PublishErrorLogEvent(HttpContext context, Exception exception, CancellationToken ct)
+        private async Task PublishErrorLogEvent(HttpContext context, IPublishEndpoint publishEndpoint, Exception exception, CancellationToken ct)
         {
             try
             {
@@ -79,7 +72,6 @@ namespace SenLink.Api.Middlewares
                 {
                     QueryString = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
                     Headers = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-                    // ToDo：Bodyの読み取りはバッファリング設定が必要なため、現時点では一旦スキップ
                     Body = null 
                 };
 
@@ -93,27 +85,20 @@ namespace SenLink.Api.Middlewares
                     AccountId: accountId > 0 ? accountId : null
                 );
 
-                await _publishEndpoint.Publish(errorEvent, ct);
+                await publishEndpoint.Publish(errorEvent, ct);
             }
             catch (Exception ex)
             {
-                // ログ記録自体の失敗は、ローカルロガーにのみ記録してアプリのレスポンスを妨げないようにする
                 _logger.LogWarning(ex, "Failed to publish error log event to RabbitMQ");
             }
         }
 
-        /// <summary>
-        /// 現在のユーザーIDを取得する
-        /// </summary>
         private long GetCurrentUserId(HttpContext context)
         {
             var userIdClaim = context.User?.FindFirst(ClaimTypes.NameIdentifier);
             return long.TryParse(userIdClaim?.Value, out var id) ? id : 0;
         }
 
-        /// <summary>
-        /// HTTPコンテキストから操作名を取得するヘルパーメソッド
-        /// </summary>
         private string GetOperationName(HttpContext context)
         {
             var action = context.Request.RouteValues["action"]?.ToString();
@@ -121,4 +106,3 @@ namespace SenLink.Api.Middlewares
         }
     }
 }
- public partial class Program { }
