@@ -1,3 +1,6 @@
+using SenLink.Domain.Modules.Audit.Entities;
+using SenLink.Domain.Modules.Audit.Enums;
+
 namespace SenLink.Domain.Modules.Audit.Contracts;
 
 /// <summary>
@@ -5,10 +8,10 @@ namespace SenLink.Domain.Modules.Audit.Contracts;
 /// </summary>
 public record ErrorLogCreatedEvent(
     string ServiceName,
-    short Severity,
+    ErrorSeverity Severity,
     string Message,
     string? StackTrace,
     string? RequestUrl,
-    string? RequestParams,
+    RequestParams? RequestParams,
     long? AccountId
 );

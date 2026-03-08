@@ -80,6 +80,9 @@ try
     // 認証リポジトリの登録
     builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
+    // 監視ログリポジトリの登録
+    builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
     // コントローラーでプロバイダーを直接注入できるようにするためのサービス登録
     builder.Services.AddIdentityServices(builder.Configuration);
 
