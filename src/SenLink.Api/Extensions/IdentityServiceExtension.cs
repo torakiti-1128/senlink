@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SenLink.Service.Modules.Auth.Interfaces;
+using SenLink.Service.Modules.Auth.Services;
 using System.Text;
 
 /// <summary>
@@ -15,6 +17,8 @@ public static class IdentityServiceExtensions
     /// <returns></returns>
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
+        services.AddScoped<ITokenService, TokenService>();
+
         /// JWT認証を追加
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
