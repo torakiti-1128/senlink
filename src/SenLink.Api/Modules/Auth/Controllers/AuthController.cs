@@ -7,32 +7,120 @@ using SenLink.Api.Middlewares;
 namespace SenLink.Api.Modules.Auth.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     // ログイン処理
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // サービスの呼び出し
         var response = await authService.LoginAsync(request);
 
-        // 認証失敗時はカスタム例外をスロー（GlobalExceptionHandlerが自動処理）
         if (response == null)
         {
             throw new UnauthorizedException("Invalid email or password.");
         }
 
-        // 成功レスポンスの構築
-        var apiResponse = new ApiResponse<AuthResponse>
+        return Ok(new ApiResponse<AuthResponse>
         {
             Success = true,
             Code = StatusCodes.Status200OK,
             Message = "Login successful.",
-            Operation = "LOGIN",
+            Operation = "AUTH_LOGIN",
             Data = response
-        };
+        });
+    }
 
-        return Ok(apiResponse);
+    // ユーザー登録処理
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        var result = await authService.RegisterAsync(request);
+
+        if (!result)
+        {
+            throw new BadRequestException("Registration failed. Please check your domain or duplicate email.");
+        }
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Registration successful.",
+            Operation = "AUTH_REGISTER"
+        });
+    }
+
+    // OTP要求
+    [HttpPost("otp/request")]
+    public async Task<IActionResult> RequestOtp([FromBody] RequestOtpRequest request)
+    {
+        var code = await authService.GenerateOtpAsync(request.Email);
+        
+        // 実際はここでメール送信をトリガーするが、今回はコードを返す（デバッグ用）
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "OTP sent.",
+            Operation = "AUTH_OTP_REQUEST",
+            Data = new { Otp = code }
+        });
+    }
+
+    // OTP検証
+    [HttpPost("otp/verify")]
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    {
+        var result = await authService.VerifyOtpAsync(request);
+
+        if (!result)
+        {
+            throw new BadRequestException("Invalid or expired OTP.");
+        }
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "OTP verified.",
+            Operation = "AUTH_OTP_VERIFY"
+        });
+    }
+
+    // パスワードリセット要求
+    [HttpPost("password-reset/request")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetRequest request)
+    {
+        var token = await authService.RequestPasswordResetAsync(request.Email);
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Reset token generated.",
+            Operation = "AUTH_PASS_RESET_REQUEST",
+            Data = new { Token = token }
+        });
+    }
+
+    // パスワードリセット実行
+    [HttpPost("password-reset/reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var result = await authService.ResetPasswordAsync(request);
+
+        if (!result)
+        {
+            throw new BadRequestException("Invalid token or email.");
+        }
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Password reset successful.",
+            Operation = "AUTH_PASS_RESET_EXECUTE"
+        });
     }
 }

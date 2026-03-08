@@ -1,40 +1,35 @@
+using SenLink.Domain.Modules.Auth.Entities;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
+using SenLink.Service.Modules.Maintenance.Interfeces;
 
 namespace SenLink.Service.Modules.Auth.Services;
 
 /// <summary>
 /// 認証サービス
 /// </summary>
-/// <param name="accountRepository">アカウントリポジトリ</param>
-/// <param name="tokenService">トークンサービス</param>
 public class AuthService(
     IAccountRepository accountRepository, 
-    ITokenService tokenService) : IAuthService
+    IOneTimePasswordRepository otpRepository,
+    ITokenService tokenService,
+    ISystemSettingProvider settingProvider) : IAuthService
 {
     /// <summary>
     /// ログイン処理
     /// </summary>
-    /// <param name="request">ログインリクエスト</param>
-    /// <returns>認証レスポンス</returns>
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
-        // DBからユーザーを取得
         var account = await accountRepository.GetByEmailAsync(request.Email);
 
-        // 存在確認 & パスワード検証
         if (account == null || !account.VerifyPassword(request.Password))
             return null;
 
-        // アカウントの状態（有効か、削除されていないか）を確認
         if (!account.IsActive || account.DeletedAt != null)
             return null;
 
-        // トークン生成
         var token = tokenService.CreateToken(account);
         
-        // 認証レスポンスを返す
         return new AuthResponse(
             Token: token,
             ExpiresAt: DateTime.UtcNow.AddMinutes(1440), 
@@ -42,5 +37,113 @@ public class AuthService(
             Email: account.Email,
             Role: account.Role.ToString()
         );
+    }
+
+    /// <summary>
+    /// ユーザー登録処理
+    /// </summary>
+    public async Task<bool> RegisterAsync(RegisterRequest request)
+    {
+        // 1. ドメイン制限チェック
+        var allowedDomainsStr = settingProvider.GetValue("AllowedEmailDomains") ?? "ac.jp";
+        var allowedDomains = allowedDomainsStr.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        
+        if (!allowedDomains.Any(domain => request.Email.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
+
+        // 2. 重複チェック
+        var existing = await accountRepository.GetByEmailAsync(request.Email);
+        if (existing != null)
+        {
+            return false;
+        }
+
+        // 3. アカウント作成
+        var account = new Account
+        {
+            Email = request.Email,
+            Role = AccountRole.Student,
+            IsActive = true
+        };
+        account.SetPassword(request.Password);
+
+        await accountRepository.AddAsync(account);
+        return true;
+    }
+
+    /// <summary>
+    /// OTP生成
+    /// </summary>
+    public async Task<string> GenerateOtpAsync(string email)
+    {
+        var code = new Random().Next(100000, 999999).ToString();
+        
+        var otp = new OneTimePassword
+        {
+            Email = email,
+            Code = code,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            Purpose = "Register"
+        };
+
+        await otpRepository.AddAsync(otp);
+        return code;
+    }
+
+    /// <summary>
+    /// OTP検証
+    /// </summary>
+    public async Task<bool> VerifyOtpAsync(VerifyOtpRequest request)
+    {
+        var otp = await otpRepository.GetValidOtpAsync(request.Email, request.Otp, "Register");
+        if (otp == null) return false;
+
+        otp.IsUsed = true;
+        await otpRepository.UpdateAsync(otp);
+        return true;
+    }
+
+    /// <summary>
+    /// パスワードリセット要求
+    /// </summary>
+    public async Task<string> RequestPasswordResetAsync(string email)
+    {
+        var account = await accountRepository.GetByEmailAsync(email);
+        if (account == null) return string.Empty;
+
+        var token = Guid.NewGuid().ToString("N");
+        
+        var otp = new OneTimePassword
+        {
+            Email = email,
+            Code = token,
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            Purpose = "PasswordReset"
+        };
+
+        await otpRepository.AddAsync(otp);
+        return token;
+    }
+
+    /// <summary>
+    /// パスワードリセット実行
+    /// </summary>
+    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var otp = await otpRepository.GetValidOtpAsync(string.Empty, request.Token, "PasswordReset");
+        if (otp == null) return false;
+
+        var account = await accountRepository.GetByEmailAsync(otp.Email);
+        if (account == null) return false;
+
+        account.SetPassword(request.NewPassword);
+        await accountRepository.UpdateAsync(account);
+
+        otp.IsUsed = true;
+        await otpRepository.UpdateAsync(otp);
+
+        return true;
     }
 }
