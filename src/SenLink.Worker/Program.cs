@@ -1,29 +1,19 @@
-using MassTransit;
+using SenLink.Infrastructure;
+using SenLink.Shared;
 using SenLink.Worker;
+using SenLink.Worker.Modules.Audit.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<Worker>();
 
-// MassTransit の設定 (Consumer側)
-builder.Services.AddMassTransit(x =>
+// Infrastructure 層のサービスを一括登録 (DB, Repositories)
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Shared 層の共通設定 (RabbitMQ) を適用し、Worker 特有の Consumer を登録
+builder.Services.AddSharedMessaging(builder.Configuration, x =>
 {
-    // Consumerの登録
     x.AddConsumer<AuditLogConsumer>();
-
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        var rabbitMqHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
-        var rabbitMqUser = builder.Configuration["RabbitMq:Username"] ?? "guest";
-        var rabbitMqPass = builder.Configuration["RabbitMq:Password"] ?? "guest";
-
-        cfg.Host(rabbitMqHost, "/", h =>
-        {
-            h.Username(rabbitMqUser);
-            h.Password(rabbitMqPass);
-        });
-
-        cfg.ConfigureEndpoints(context);
-    });
+    x.AddConsumer<ErrorLogConsumer>();
 });
 
 var host = builder.Build();

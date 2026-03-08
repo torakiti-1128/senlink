@@ -1,6 +1,9 @@
 using MassTransit;
 using SenLink.Domain.Modules.Audit.Contracts;
 using SenLink.Domain.Modules.Audit.Entities;
+using SenLink.Domain.Modules.Audit.Repositories;
+
+namespace SenLink.Worker.Modules.Audit.Consumers;
 
 /// <summary>
 /// システムエラーが発生したことを通知するイベントメッセージを受信して、エラーログを保存する
