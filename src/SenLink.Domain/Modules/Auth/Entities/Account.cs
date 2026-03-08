@@ -23,6 +23,15 @@ public class Account : BaseEntity
     public DateTime? DeletedAt { get; set; }
 
     /// <summary>
+    /// メールアドレスが許可されたドメインかどうかを検証する（ドメイン層のビジネスルール）
+    /// </summary>
+    public static bool IsValidEmailDomain(string email, string[] allowedDomains)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+        return allowedDomains.Any(domain => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
     /// パスワードの設定
     /// </summary>
     /// <param name="rawPassword">平文のパスワード</param>
