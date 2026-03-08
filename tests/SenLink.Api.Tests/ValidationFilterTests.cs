@@ -1,4 +1,13 @@
 using SenLink.Api.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Moq;
+using Xunit;
+using System.Collections.Generic;
 
 namespace SenLink.Api.Tests.Filters;
 
@@ -29,9 +38,18 @@ public class ValidationFilterTests
 
         // Assert
         var result = Assert.IsType<BadRequestObjectResult>(context.Result);
-        // JSONの中身（success=falseなど）が期待通りか確認
-        dynamic? response = result.Value;
-        Assert.False(response?.success);
-        Assert.Equal("One or more validation errors occurred.", response?.errorMessage);
+        
+        // 型安全に値を確認するためにリフレクションを使用
+        var response = result.Value;
+        Assert.NotNull(response);
+        
+        var successProp = response.GetType().GetProperty("success");
+        var errorMessageProp = response.GetType().GetProperty("errorMessage");
+        
+        Assert.NotNull(successProp);
+        Assert.NotNull(errorMessageProp);
+        
+        Assert.False((bool?)successProp.GetValue(response));
+        Assert.Equal("One or more validation errors occurred.", errorMessageProp.GetValue(response));
     }
 }
