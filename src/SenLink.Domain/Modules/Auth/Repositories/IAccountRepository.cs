@@ -19,7 +19,7 @@ public interface IAccountRepository
     /// </summary>
     /// <param name="id">アカウントID</param>
     /// <returns>一致するアカウント情報</returns>
-    Task<Account?> GetByIdAsync(Guid id);
+    Task<Account?> GetByIdAsync(long id);
 
     /// <summary>
     /// 新規登録
@@ -31,5 +31,5 @@ public interface IAccountRepository
     /// 更新
     /// </summary>
     /// <param name="account">アカウント情報</param>
-    void Update(Account account);
+    Task UpdateAsync(Account account);
 }

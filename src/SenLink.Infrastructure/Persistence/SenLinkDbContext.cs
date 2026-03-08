@@ -24,6 +24,7 @@ public class SenLinkDbContext : DbContext
     // Auth Service Entities
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<LoginHistory> LoginHistories => Set<LoginHistory>();
+    public DbSet<OneTimePassword> OneTimePasswords => Set<OneTimePassword>();
 
     // School Service Entities
     public DbSet<Department> Departments => Set<Department>();
