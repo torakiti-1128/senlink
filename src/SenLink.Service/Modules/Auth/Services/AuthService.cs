@@ -44,11 +44,11 @@ public class AuthService(
     /// </summary>
     public async Task<bool> RegisterAsync(RegisterRequest request)
     {
-        // 1. ドメイン制限チェック
-        var allowedDomainsStr = settingProvider.GetValue("AllowedEmailDomains") ?? "ac.jp";
+        // 1. ドメイン制限チェック（ドメイン層のルールを呼び出し）
+        var allowedDomainsStr = settingProvider.GetValue("AllowedEmailDomains") ?? "senlink.dev";
         var allowedDomains = allowedDomainsStr.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         
-        if (!allowedDomains.Any(domain => request.Email.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
+        if (!Account.IsValidEmailDomain(request.Email, allowedDomains))
         {
             return false;
         }
@@ -126,14 +126,15 @@ public class AuthService(
         await otpRepository.AddAsync(otp);
         return token;
     }
+/// <summary>
+/// パスワードリセット実行
+/// </summary>
+public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+{
+    // OneTimePasswordテーブルをトークン保存に流用
+    var otp = await otpRepository.GetValidByTokenAsync(request.Token, "PasswordReset");
+    if (otp == null) return false;
 
-    /// <summary>
-    /// パスワードリセット実行
-    /// </summary>
-    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
-    {
-        var otp = await otpRepository.GetValidOtpAsync(string.Empty, request.Token, "PasswordReset");
-        if (otp == null) return false;
 
         var account = await accountRepository.GetByEmailAsync(otp.Email);
         if (account == null) return false;

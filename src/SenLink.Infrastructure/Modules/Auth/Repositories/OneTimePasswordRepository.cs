@@ -23,6 +23,15 @@ public class OneTimePasswordRepository(SenLinkDbContext context) : IOneTimePassw
                                      x.ExpiresAt > DateTime.UtcNow);
     }
 
+    public async Task<OneTimePassword?> GetValidByTokenAsync(string token, string purpose)
+    {
+        return await context.Set<OneTimePassword>()
+            .FirstOrDefaultAsync(x => x.Code == token && 
+                                     x.Purpose == purpose && 
+                                     !x.IsUsed && 
+                                     x.ExpiresAt > DateTime.UtcNow);
+    }
+
     public async Task UpdateAsync(OneTimePassword otp)
     {
         context.Set<OneTimePassword>().Update(otp);
