@@ -114,6 +114,83 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
+    // 自分の教員プロフィール取得
+    [HttpGet("teachers/me")]
+    public async Task<IActionResult> GetTeacherMe()
+    {
+        long accountId = GetCurrentAccountId();
+
+        var response = await schoolService.GetTeacherMeAsync(accountId);
+
+        if (response == null)
+        {
+            throw new NotFoundException("Teacher profile not found.");
+        }
+
+        return Ok(new ApiResponse<TeacherMeResponse>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "OK",
+            Operation = "school_teachers_me_get",
+            Data = response
+        });
+    }
+
+    // 自分の学生プロフィール更新
+    [HttpPatch("students/me/profile")]
+    public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateStudentProfileRequest request)
+    {
+        long accountId = GetCurrentAccountId();
+        var success = await schoolService.UpdateStudentProfileAsync(accountId, request);
+
+        if (!success) throw new NotFoundException("Student profile not found.");
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Profile updated",
+            Operation = "school_students_me_profile_update"
+        });
+    }
+
+    // 就活状況更新
+    [HttpPatch("students/me/job-hunting")]
+    public async Task<IActionResult> UpdateJobHuntingStatus([FromBody] UpdateJobHuntingStatusRequest request)
+    {
+        long accountId = GetCurrentAccountId();
+        var success = await schoolService.UpdateJobHuntingStatusAsync(accountId, request);
+
+        if (!success) throw new NotFoundException("Student profile not found.");
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Job hunting status updated",
+            Operation = "school_students_me_job_hunting_update"
+        });
+    }
+
+    // 自分の教員プロフィール更新
+    [HttpPatch("teachers/me/profile")]
+    public async Task<IActionResult> UpdateTeacherProfile([FromBody] UpdateTeacherProfileRequest request)
+    {
+        long accountId = GetCurrentAccountId();
+        var success = await schoolService.UpdateTeacherProfileAsync(accountId, request);
+
+        if (!success) throw new NotFoundException("Teacher profile not found.");
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Code = StatusCodes.Status200OK,
+            Message = "Profile updated",
+            Operation = "school_teachers_me_profile_update"
+        });
+    }
+
     private long GetCurrentAccountId()
     {
         // TODO: テストのために一時的にヘッダーから取得できるようにする、またはクレームから取得

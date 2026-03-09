@@ -15,3 +15,17 @@ public record CreateTeacherProfileOnboardingRequest(
     string? Title,
     string? OfficeLocation,
     object? ProfileData);
+
+public record UpdateStudentProfileRequest(
+    string? Pr,
+    string? Certifications,
+    string? Links);
+
+public record UpdateJobHuntingStatusRequest(
+    bool IsJobHunting);
+
+public record UpdateTeacherProfileRequest(
+    string? Title,
+    string? OfficeLocation,
+    string? Career,
+    string? Speciality);

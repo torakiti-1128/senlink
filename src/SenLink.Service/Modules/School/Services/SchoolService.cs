@@ -117,4 +117,60 @@ public class SchoolService(
             student.IsJobHunting,
             student.ProfileData);
     }
+
+    public async Task<TeacherMeResponse?> GetTeacherMeAsync(long accountId)
+    {
+        var teacher = await teacherRepository.GetByAccountIdAsync(accountId);
+        if (teacher == null) return null;
+
+        return new TeacherMeResponse(
+            teacher.Id,
+            teacher.AccountId,
+            teacher.Name,
+            teacher.NameKana,
+            teacher.Title,
+            teacher.OfficeLocation,
+            teacher.ProfileData);
+    }
+
+    public async Task<bool> UpdateStudentProfileAsync(long accountId, UpdateStudentProfileRequest request)
+    {
+        var student = await studentRepository.GetByAccountIdAsync(accountId);
+        if (student == null) return false;
+
+        student.ProfileData ??= new StudentProfile();
+        student.ProfileData.Pr = request.Pr;
+        student.ProfileData.Certifications = request.Certifications;
+        student.ProfileData.Links = request.Links;
+
+        await studentRepository.UpdateAsync(student);
+        return true;
+    }
+
+    public async Task<bool> UpdateJobHuntingStatusAsync(long accountId, UpdateJobHuntingStatusRequest request)
+    {
+        var student = await studentRepository.GetByAccountIdAsync(accountId);
+        if (student == null) return false;
+
+        student.IsJobHunting = request.IsJobHunting;
+
+        await studentRepository.UpdateAsync(student);
+        return true;
+    }
+
+    public async Task<bool> UpdateTeacherProfileAsync(long accountId, UpdateTeacherProfileRequest request)
+    {
+        var teacher = await teacherRepository.GetByAccountIdAsync(accountId);
+        if (teacher == null) return false;
+
+        teacher.Title = request.Title;
+        teacher.OfficeLocation = request.OfficeLocation;
+
+        teacher.ProfileData ??= new TeacherProfile();
+        teacher.ProfileData.Career = request.Career;
+        teacher.ProfileData.Speciality = request.Speciality;
+
+        await teacherRepository.UpdateAsync(teacher);
+        return true;
+    }
 }

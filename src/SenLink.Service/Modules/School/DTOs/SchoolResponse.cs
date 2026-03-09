@@ -37,3 +37,12 @@ public record StudentMeResponse(
     int AdmissionYear,
     bool IsJobHunting,
     object? ProfileData);
+
+public record TeacherMeResponse(
+    long TeacherId,
+    long AccountId,
+    string Name,
+    string NameKana,
+    string? Title,
+    string? OfficeLocation,
+    object? ProfileData);

@@ -172,4 +172,160 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         Assert.NotNull(result?.Data);
         Assert.Equal("9999999", result.Data.StudentNumber);
     }
+
+    [Fact]
+    public async Task CreateTeacherProfile_ShouldReturnCreated()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        
+        var account = new Account { Email = "teacher-test@senlink.dev", Role = AccountRole.Teacher };
+        account.SetPassword("Password123!");
+        context.Accounts.Add(account);
+        await context.SaveChangesAsync();
+
+        var request = new {
+            name = "田中 教員",
+            nameKana = "たなか きょういん",
+            title = "担任",
+            officeLocation = "201号室"
+        };
+
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/v1/school/onboarding/teacher-profile", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetMyTeacherProfile_ShouldReturnProfile()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        
+        var account = new Account { Email = "teacher-me@senlink.dev", Role = AccountRole.Teacher };
+        account.SetPassword("Password123!");
+        context.Accounts.Add(account);
+        await context.SaveChangesAsync();
+
+        var teacher = new Teacher {
+            AccountId = account.Id,
+            Name = "田中 教員",
+            NameKana = "たなか きょういん",
+            Title = "担任",
+            OfficeLocation = "201号室"
+        };
+        context.Teachers.Add(teacher);
+        await context.SaveChangesAsync();
+
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+
+        // Act
+        var response = await _client.GetAsync("/api/v1/school/teachers/me");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<TeacherMeResponse>>();
+        Assert.NotNull(result?.Data);
+        Assert.Equal("田中 教員", result.Data.Name);
+    }
+
+    [Fact]
+    public async Task UpdateStudentJobProfile_ShouldReturnOk()
+    {
+        // Arrange
+        await SeedSchoolDataAsync();
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        var dept = await context.Departments.FirstAsync();
+        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "A組" };
+        context.Classes.Add(@class);
+        
+        var account = new Account { Email = "update-test@senlink.dev", Role = AccountRole.Student };
+        account.SetPassword("Password123!");
+        context.Accounts.Add(account);
+        await context.SaveChangesAsync();
+
+        var student = new Student {
+            AccountId = account.Id,
+            ClassId = @class.Id,
+            StudentNumber = "8888888",
+            Name = "更新テスト",
+            NameKana = "こうしんてすと",
+            DateOfBirth = new DateOnly(2000, 1, 1),
+            AdmissionYear = 2026
+        };
+        context.Students.Add(student);
+        await context.SaveChangesAsync();
+
+        var request = new {
+            pr = "新しい自己PRです",
+            certifications = "基本情報技術者",
+            links = "https://github.com/test"
+        };
+
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+
+        // Act
+        var response = await _client.PatchAsJsonAsync("/api/v1/school/students/me/profile", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        // DBが更新されているか確認
+        using var checkScope = _factory.Services.CreateScope();
+        var checkContext = checkScope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        var updatedStudent = await checkContext.Students.FirstAsync(s => s.AccountId == account.Id);
+        Assert.Equal("新しい自己PRです", updatedStudent.ProfileData?.Pr);
+    }
+
+    [Fact]
+    public async Task UpdateJobHuntingStatus_ShouldReturnOk()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        
+        var account = new Account { Email = "jh-test@senlink.dev", Role = AccountRole.Student };
+        account.SetPassword("Password123!");
+        context.Accounts.Add(account);
+        await context.SaveChangesAsync();
+
+        var student = new Student {
+            AccountId = account.Id,
+            ClassId = 1, // Dummy
+            StudentNumber = "7777777",
+            Name = "就活テスト",
+            NameKana = "しゅうかつてすと",
+            DateOfBirth = new DateOnly(2000, 1, 1),
+            AdmissionYear = 2026,
+            IsJobHunting = true
+        };
+        context.Students.Add(student);
+        await context.SaveChangesAsync();
+
+        var request = new { isJobHunting = false };
+
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+
+        // Act
+        var response = await _client.PatchAsJsonAsync("/api/v1/school/students/me/job-hunting", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        using var checkScope = _factory.Services.CreateScope();
+        var checkContext = checkScope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+        var updatedStudent = await checkContext.Students.FirstAsync(s => s.AccountId == account.Id);
+        Assert.False(updatedStudent.IsJobHunting);
+    }
 }
