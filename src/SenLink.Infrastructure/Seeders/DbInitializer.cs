@@ -1,4 +1,5 @@
 using SenLink.Domain.Modules.Auth.Entities;
+using SenLink.Domain.Modules.Auth.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace SenLink.Infrastructure.Persistence.Seeders;
@@ -17,17 +18,9 @@ public static class DbInitializer
         if (await context.Accounts.AnyAsync()) return;
 
         // アドミンユーザーの作成（開発用のためハードコーディング）
-        var admin = new Account
-        {
-            Email = "admin@senlink.dev",
-            Role = AccountRole.Admin,
-            IsActive = true
-        };
+        var adminAccount = Account.CreateSystemAdmin("admin@senlink.dev", "AdminPassword123!");
 
-        // パスワードをハッシュ化してセット
-        admin.SetPassword("AdminPassword123!");
-
-        context.Accounts.Add(admin);
+        context.Accounts.Add(adminAccount);
         await context.SaveChangesAsync();
     }
 }

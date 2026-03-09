@@ -27,13 +27,21 @@ namespace SenLink.Api.Middlewares
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, "Unhandled exception: {Message} at {Path}", exception.Message, httpContext.Request.Path);
-
             var (statusCode, message, errorType, details) = exception switch
             {
                 SenLinkException ex => (ex.StatusCode, ex.Message, ex.ErrorType, ex.Errors),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.", "SERVER_ERROR", null)
             };
+
+            // 400系は警告、それ以外はエラーとしてログ出力
+            if (statusCode >= 400 && statusCode < 500)
+            {
+                _logger.LogWarning(exception, "Client error: {Message} at {Path}", exception.Message, httpContext.Request.Path);
+            }
+            else
+            {
+                _logger.LogError(exception, "Unhandled exception: {Message} at {Path}", exception.Message, httpContext.Request.Path);
+            }
 
             // スコープを作成して IPublishEndpoint を取得する
             using (var scope = _serviceProvider.CreateScope())
