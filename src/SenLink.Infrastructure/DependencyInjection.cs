@@ -6,6 +6,8 @@ using SenLink.Domain.Modules.Audit.Repositories;
 using SenLink.Infrastructure.Modules.Audit.Repositories;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Infrastructure.Modules.Auth.Repositories;
+using SenLink.Domain.Modules.School.Repositories;
+using SenLink.Infrastructure.Modules.School.Repositories;
 using SenLink.Domain.Maintenance.Repositories;
 using SenLink.Infrastructure.Modules.Maintenance.Repositories;
 
@@ -34,6 +36,12 @@ public static class DependencyInjection
 
         // Maintenance
         services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+
+        // School
+        services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IClassRepository, ClassRepository>();
+        services.AddScoped<IStudentRepository, StudentRepository>();
+        services.AddScoped<ITeacherRepository, TeacherRepository>();
 
         return services;
     }

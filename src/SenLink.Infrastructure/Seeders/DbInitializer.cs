@@ -1,4 +1,5 @@
 using SenLink.Domain.Modules.Auth.Entities;
+using SenLink.Domain.Modules.Auth.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace SenLink.Infrastructure.Persistence.Seeders;

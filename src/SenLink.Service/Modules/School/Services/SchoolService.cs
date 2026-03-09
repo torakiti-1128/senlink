@@ -1,0 +1,120 @@
+using SenLink.Domain.Modules.School.Entities;
+using SenLink.Domain.Modules.School.Enums;
+using SenLink.Domain.Modules.School.Repositories;
+using SenLink.Service.Modules.School.DTOs;
+using SenLink.Service.Modules.School.Interfaces;
+
+namespace SenLink.Service.Modules.School.Services;
+
+public class SchoolService(
+    IDepartmentRepository departmentRepository,
+    IClassRepository classRepository,
+    IStudentRepository studentRepository,
+    ITeacherRepository teacherRepository) : ISchoolService
+{
+    public async Task<DepartmentListResponse> GetDepartmentsAsync()
+    {
+        var departments = await departmentRepository.GetAllAsync();
+        return new DepartmentListResponse(
+            departments.Select(d => new DepartmentDto(d.Id, d.Name, d.Code)).ToList()
+        );
+    }
+
+    public async Task<ClassListResponse> GetClassesAsync(long? departmentId, int? fiscalYear, int? grade)
+    {
+        var classes = await classRepository.GetFilteredAsync(departmentId, fiscalYear, grade);
+        
+        var departments = await departmentRepository.GetAllAsync();
+        var deptDict = departments.ToDictionary(d => d.Id, d => d.Name);
+
+        return new ClassListResponse(
+            classes.Select(c => new ClassDto(
+                c.Id, 
+                c.DepartmentId, 
+                deptDict.GetValueOrDefault(c.DepartmentId, "Unknown"),
+                c.FiscalYear,
+                c.Grade,
+                c.Name)).ToList()
+        );
+    }
+
+    public async Task<StudentProfileCreatedResponse> CreateStudentProfileAsync(long accountId, CreateStudentProfileOnboardingRequest request)
+    {
+        // アカウントごとの重複チェック
+        var existingByAccount = await studentRepository.GetByAccountIdAsync(accountId);
+        if (existingByAccount != null) return null!;
+
+        // 学籍番号の重複チェック
+        var existingByNumber = await studentRepository.GetByStudentNumberAsync(request.StudentNumber);
+        if (existingByNumber != null) return null!;
+
+        var student = new Student
+        {
+            AccountId = accountId,
+            ClassId = request.ClassId,
+            StudentNumber = request.StudentNumber,
+            Name = request.Name,
+            NameKana = request.NameKana,
+            DateOfBirth = DateOnly.FromDateTime(request.DateOfBirth),
+            Gender = (Gender)request.Gender,
+            AdmissionYear = request.AdmissionYear,
+            IsJobHunting = true
+        };
+
+        await studentRepository.AddAsync(student);
+
+        return new StudentProfileCreatedResponse(
+            student.Id,
+            student.AccountId,
+            student.ClassId,
+            student.StudentNumber,
+            student.IsJobHunting);
+    }
+
+    public async Task<TeacherProfileCreatedResponse> CreateTeacherProfileAsync(long accountId, CreateTeacherProfileOnboardingRequest request)
+    {
+        var existing = await teacherRepository.GetByAccountIdAsync(accountId);
+        if (existing != null) return null!;
+
+        var teacher = new Teacher
+        {
+            AccountId = accountId,
+            Name = request.Name,
+            NameKana = request.NameKana,
+            Title = request.Title,
+            OfficeLocation = request.OfficeLocation
+            // ProfileData は後ほどマッピング
+        };
+
+        await teacherRepository.AddAsync(teacher);
+
+        return new TeacherProfileCreatedResponse(teacher.Id, teacher.AccountId);
+    }
+
+    public async Task<StudentMeResponse?> GetStudentMeAsync(long accountId)
+    {
+        var student = await studentRepository.GetByAccountIdAsync(accountId);
+        if (student == null) return null;
+
+        var classDto = new ClassDto(
+            student.Class.Id,
+            student.Class.DepartmentId,
+            student.Class.Department.Name,
+            student.Class.FiscalYear,
+            student.Class.Grade,
+            student.Class.Name);
+
+        return new StudentMeResponse(
+            student.Id,
+            student.AccountId,
+            student.StudentNumber,
+            student.Name,
+            student.NameKana,
+            classDto,
+            student.DateOfBirth.ToDateTime(TimeOnly.MinValue),
+            (short)student.Gender,
+            student.AdmissionYear,
+            student.IsJobHunting,
+            student.ProfileData);
+    }
+}
