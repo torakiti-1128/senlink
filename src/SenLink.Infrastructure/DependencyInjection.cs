@@ -29,6 +29,7 @@ public static class DependencyInjection
 
         // Auth
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<ILoginHistoryRepository, LoginHistoryRepository>();
         services.AddScoped<IOneTimePasswordRepository, OneTimePasswordRepository>();
 
         // Maintenance

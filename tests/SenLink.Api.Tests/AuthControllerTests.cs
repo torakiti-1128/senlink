@@ -136,6 +136,60 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Login_ShouldRecordHistory_WhenLoginIsSuccessful()
+    {
+        // Arrange
+        await SeedSettingsAsync();
+        var email = "history-test@senlink.dev";
+        var regRequest = new RegisterRequest(email, "Password123!");
+        await _client.PostAsJsonAsync("/api/v1/auth/register", regRequest);
+
+        var loginRequest = new LoginRequest(email, "Password123!");
+
+        // Act
+        var loginResponse = await _client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
+
+        // Assert: 履歴がDBに作成されているか
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+            var account = await context.Accounts.FirstAsync(a => a.Email == email);
+            var history = await context.LoginHistories.FirstOrDefaultAsync(h => h.AccountId == account.Id);
+            
+            Assert.NotNull(history);
+            Assert.Equal(SenLink.Domain.Modules.Auth.Enums.LoginStatus.Success, history.Status);
+        }
+    }
+
+    [Fact]
+    public async Task Login_ShouldRecordHistory_WhenLoginFailsDueToWrongPassword()
+    {
+        // Arrange
+        await SeedSettingsAsync();
+        var email = "failure-test@senlink.dev";
+        var regRequest = new RegisterRequest(email, "Password123!");
+        await _client.PostAsJsonAsync("/api/v1/auth/register", regRequest);
+
+        var loginRequest = new LoginRequest(email, "WrongPassword!");
+
+        // Act
+        var loginResponse = await _client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
+        Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
+
+        // Assert: 失敗履歴がDBに作成されているか
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
+            var account = await context.Accounts.FirstAsync(a => a.Email == email);
+            var history = await context.LoginHistories.FirstOrDefaultAsync(h => h.AccountId == account.Id);
+            
+            Assert.NotNull(history);
+            Assert.Equal(SenLink.Domain.Modules.Auth.Enums.LoginStatus.Failure, history.Status);
+        }
+    }
+
     public class OtpResponse { public string Otp { get; set; } = ""; }
     public class TokenResponse { public string Token { get; set; } = ""; }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using SenLink.Domain.Modules.Auth.Entities;
+using SenLink.Domain.Modules.Auth.Enums;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
@@ -12,6 +13,7 @@ namespace SenLink.Service.Modules.Auth.Services;
 /// </summary>
 public class AuthService(
     IAccountRepository accountRepository, 
+    ILoginHistoryRepository loginHistoryRepository,
     IOneTimePasswordRepository otpRepository,
     ITokenService tokenService,
     ISystemSettingProvider settingProvider) : IAuthService
@@ -23,10 +25,25 @@ public class AuthService(
     {
         var account = await accountRepository.GetByEmailAsync(request.Email);
 
-        if (account == null || !account.VerifyPassword(request.Password))
+        if (account == null)
             return null;
 
-        if (!account.IsActive || account.DeletedAt != null)
+        // パスワード検証および有効状態チェック
+        bool isPasswordValid = account.VerifyPassword(request.Password);
+        bool isUserActive = account.IsActive && account.DeletedAt == null;
+        bool isSuccess = isPasswordValid && isUserActive;
+
+        // ログイン履歴の保存
+        var history = new LoginHistory
+        {
+            AccountId = account.Id,
+            IpAddress = request.IpAddress,
+            UserAgent = request.UserAgent,
+            Status = isSuccess ? LoginStatus.Success : LoginStatus.Failure
+        };
+        await loginHistoryRepository.AddAsync(history);
+
+        if (!isSuccess)
             return null;
 
         var token = tokenService.CreateToken(account);

@@ -1,3 +1,5 @@
+namespace SenLink.Domain.Modules.Auth.Enums;
+
 /// <summary>
 /// アカウントの権限ロール
 /// </summary>

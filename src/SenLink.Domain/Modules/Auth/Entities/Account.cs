@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using SenLink.Domain.Common;
+using SenLink.Domain.Modules.Auth.Enums;
 
 namespace SenLink.Domain.Modules.Auth.Entities;
 

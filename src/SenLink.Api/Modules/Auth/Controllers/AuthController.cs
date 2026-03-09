@@ -14,7 +14,14 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var response = await authService.LoginAsync(request);
+        // クライアント情報を取得してリクエストを補完
+        var fullRequest = request with 
+        { 
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            UserAgent = Request.Headers.UserAgent.ToString()
+        };
+
+        var response = await authService.LoginAsync(fullRequest);
 
         if (response == null)
         {
