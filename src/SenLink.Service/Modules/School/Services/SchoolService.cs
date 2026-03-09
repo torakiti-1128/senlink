@@ -83,7 +83,6 @@ public class SchoolService(
             NameKana = request.NameKana,
             Title = request.Title,
             OfficeLocation = request.OfficeLocation
-            // ProfileData は後ほどマッピング
         };
 
         await teacherRepository.AddAsync(teacher);

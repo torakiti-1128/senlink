@@ -36,3 +36,30 @@ public class CreateTeacherProfileValidator : AbstractValidator<CreateTeacherProf
         RuleFor(x => x.OfficeLocation).MaximumLength(100);
     }
 }
+
+/// <summary>
+/// 学生プロフィール更新のバリデーター
+/// </summary>
+public class UpdateStudentProfileValidator : AbstractValidator<UpdateStudentProfileRequest>
+{
+    public UpdateStudentProfileValidator()
+    {
+        RuleFor(x => x.Pr).MaximumLength(2000);
+        RuleFor(x => x.Certifications).MaximumLength(1000);
+        RuleFor(x => x.Links).MaximumLength(1000);
+    }
+}
+
+/// <summary>
+/// 教員プロフィール更新のバリデーター
+/// </summary>
+public class UpdateTeacherProfileValidator : AbstractValidator<UpdateTeacherProfileRequest>
+{
+    public UpdateTeacherProfileValidator()
+    {
+        RuleFor(x => x.Title).MaximumLength(100);
+        RuleFor(x => x.OfficeLocation).MaximumLength(100);
+        RuleFor(x => x.Career).MaximumLength(2000);
+        RuleFor(x => x.Speciality).MaximumLength(1000);
+    }
+}
