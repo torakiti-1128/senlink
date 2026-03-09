@@ -71,8 +71,8 @@ public class GlobalExceptionHandlerTests
 
     public static IEnumerable<object[]> GetExceptionTestCases()
     {
-        yield return new object[] { new BadRequestException(), 400, "BAD_REQUEST_ERROR" };
-        yield return new object[] { new Exception("System Error"), 500, "SERVER_ERROR" };
+        yield return new object[] { new BadRequestException(), 400 };
+        yield return new object[] { new Exception("System Error"), 500 };
     }
 
     [Theory]

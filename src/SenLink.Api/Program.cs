@@ -11,6 +11,7 @@ using SenLink.Shared;
 using SenLink.Api.Filters;
 using SenLink.Service.Modules.Maintenance.Services;
 using SenLink.Service.Modules.Maintenance.Interfeces;
+using SenLink.Domain.Maintenance.Repositories;
 
 // Serilogをセットアップ (アプリ起動前のエラーをキャッチするため)
 Log.Logger = new LoggerConfiguration()
@@ -31,10 +32,11 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-    // バリデーションエラーを統一された形式で返すフィルター
+    // バリデーションエラーと成功レスポンスを統一された形式で返すフィルターを登録
     builder.Services.AddControllers(options =>
     {
         options.Filters.Add<ValidationFilter>();
+        options.Filters.Add<SuccessResponseFilter>();
     })
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -42,15 +44,10 @@ try
         options.SuppressModelStateInvalidFilter = true;
     });
 
-    // FluentValidationの有効化（Service層などにあるValidatorを自動スキャン）
+    // FluentValidationの有効化（特定のプロジェクトからValidatorをスキャン）
     builder.Services.AddFluentValidationAutoValidation();
-    builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
-
-    // 成功レスポンスを自動で ApiResponse に包むフィルターを登録
-    builder.Services.AddControllers(options =>
-    {
-        options.Filters.Add<SuccessResponseFilter>();
-    });
+    builder.Services.AddValidatorsFromAssembly(typeof(SenLink.Service.DependencyInjection).Assembly);
+    builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
     // グローバル例外ハンドラーの登録
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -125,6 +122,22 @@ try
 
     // ヘルスチェックのエンドポイントを公開
     app.MapHealthChecks("/health");
+
+    // システム設定のキャッシュをロード
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            var provider = scope.ServiceProvider.GetRequiredService<SystemSettingProvider>();
+            var repository = scope.ServiceProvider.GetRequiredService<ISystemSettingRepository>();
+            await provider.LoadCacheAsync(repository);
+            Log.Information("System settings cache loaded successfully.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to load system settings cache during startup.");
+        }
+    }
 
     // アプリケーション起動
     app.Run();
