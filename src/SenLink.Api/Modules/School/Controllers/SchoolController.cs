@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 using SenLink.Api.Models;
 using SenLink.Api.Middlewares;
+using System.Security.Claims;
 
 namespace SenLink.Api.Modules.School.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize]
 public class SchoolController(ISchoolService schoolService) : ControllerBase
 {
     // 学科一覧取得
@@ -47,6 +50,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 初回プロフィール登録（学生）
     [HttpPost("onboarding/student-profile")]
+    [Authorize(Roles = "Student")]
     public async Task<IActionResult> CreateStudentProfile([FromBody] CreateStudentProfileOnboardingRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -70,6 +74,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 初回プロフィール登録（教員）
     [HttpPost("onboarding/teacher-profile")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> CreateTeacherProfile([FromBody] CreateTeacherProfileOnboardingRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -93,6 +98,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 自分の学生プロフィール取得
     [HttpGet("students/me")]
+    [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetStudentMe()
     {
         long accountId = GetCurrentAccountId();
@@ -116,6 +122,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 自分の教員プロフィール取得
     [HttpGet("teachers/me")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> GetTeacherMe()
     {
         long accountId = GetCurrentAccountId();
@@ -139,6 +146,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 自分の学生プロフィール更新
     [HttpPatch("students/me/profile")]
+    [Authorize(Roles = "Student")]
     public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateStudentProfileRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -157,6 +165,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 就活状況更新
     [HttpPatch("students/me/job-hunting")]
+    [Authorize(Roles = "Student")]
     public async Task<IActionResult> UpdateJobHuntingStatus([FromBody] UpdateJobHuntingStatusRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -175,6 +184,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     // 自分の教員プロフィール更新
     [HttpPatch("teachers/me/profile")]
+    [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateTeacherProfile([FromBody] UpdateTeacherProfileRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -193,11 +203,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
 
     private long GetCurrentAccountId()
     {
-        // TODO: テストのために一時的にヘッダーから取得できるようにする、またはクレームから取得
-        var headerId = Request.Headers["X-Account-Id"].ToString();
-        if (!string.IsNullOrEmpty(headerId)) return long.Parse(headerId);
-
-        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         return claim != null ? long.Parse(claim.Value) : 0;
     }
 }

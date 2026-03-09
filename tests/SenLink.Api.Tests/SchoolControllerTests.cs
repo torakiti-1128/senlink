@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,10 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
                 {
                     options.UseInMemoryDatabase(_dbName);
                 });
+
+                // テスト用の認証スキームを追加
+                services.AddAuthentication("Test")
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
             });
         });
         _client = _factory.CreateClient();
@@ -50,11 +55,19 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         }
     }
 
+    private void SetAuthHeader(long accountId, string role = "Student")
+    {
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Test-AccountId", accountId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-Role", role);
+    }
+
     [Fact]
     public async Task GetDepartments_ShouldReturnListOfDepartments()
     {
         // Arrange
         await SeedSchoolDataAsync();
+        SetAuthHeader(1);
 
         // Act
         var response = await _client.GetAsync("/api/v1/school/departments");
@@ -73,6 +86,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         await SeedSchoolDataAsync();
+        SetAuthHeader(1);
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         var dept = await context.Departments.FirstAsync(d => d.Code == "INF");
@@ -121,8 +135,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
             admissionYear = 2026
         };
 
-        // TODO: 認証の実装後にトークンをセットする
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Student");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/school/onboarding/student-profile", request);
@@ -160,8 +173,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         context.Students.Add(student);
         await context.SaveChangesAsync();
 
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Student");
 
         // Act
         var response = await _client.GetAsync("/api/v1/school/students/me");
@@ -192,8 +204,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
             officeLocation = "201号室"
         };
 
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Teacher");
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/school/onboarding/teacher-profile", request);
@@ -224,8 +235,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         context.Teachers.Add(teacher);
         await context.SaveChangesAsync();
 
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Teacher");
 
         // Act
         var response = await _client.GetAsync("/api/v1/school/teachers/me");
@@ -271,8 +281,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
             links = "https://github.com/test"
         };
 
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Student");
 
         // Act
         var response = await _client.PatchAsJsonAsync("/api/v1/school/students/me/profile", request);
@@ -314,8 +323,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
 
         var request = new { isJobHunting = false };
 
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Account-Id", account.Id.ToString());
+        SetAuthHeader(account.Id, "Student");
 
         // Act
         var response = await _client.PatchAsJsonAsync("/api/v1/school/students/me/job-hunting", request);
