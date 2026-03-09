@@ -8,12 +8,18 @@ using System.Security.Claims;
 
 namespace SenLink.Api.Modules.School.Controllers;
 
+/// <summary>
+/// 学校情報（学科・クラス）および学生・教員のプロフィールを管理するコントローラー
+/// </summary>
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
 public class SchoolController(ISchoolService schoolService) : ControllerBase
 {
-    // 学科一覧取得
+    /// <summary>
+    /// 学科の一覧を取得します
+    /// </summary>
+    /// <returns>学科リスト</returns>
     [HttpGet("departments")]
     public async Task<IActionResult> GetDepartments()
     {
@@ -29,7 +35,13 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // クラス一覧取得
+    /// <summary>
+    /// クラスの一覧を取得します。学科、年度、学年での絞り込みが可能です。
+    /// </summary>
+    /// <param name="departmentId">学科ID</param>
+    /// <param name="fiscalYear">年度</param>
+    /// <param name="grade">学年</param>
+    /// <returns>クラスリスト</returns>
     [HttpGet("classes")]
     public async Task<IActionResult> GetClasses(
         [FromQuery] long? departmentId, 
@@ -48,7 +60,11 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 初回プロフィール登録（学生）
+    /// <summary>
+    /// 【学生専用】初回ログイン時のプロフィール登録を行います
+    /// </summary>
+    /// <param name="request">登録内容</param>
+    /// <returns>作成されたプロフィール情報</returns>
     [HttpPost("onboarding/student-profile")]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> CreateStudentProfile([FromBody] CreateStudentProfileOnboardingRequest request)
@@ -72,7 +88,11 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 初回プロフィール登録（教員）
+    /// <summary>
+    /// 【教員専用】初回ログイン時のプロフィール登録を行います
+    /// </summary>
+    /// <param name="request">登録内容</param>
+    /// <returns>作成されたプロフィール情報</returns>
     [HttpPost("onboarding/teacher-profile")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> CreateTeacherProfile([FromBody] CreateTeacherProfileOnboardingRequest request)
@@ -96,7 +116,10 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 自分の学生プロフィール取得
+    /// <summary>
+    /// 【学生専用】自身のプロフィール情報を取得します
+    /// </summary>
+    /// <returns>学生プロフィール詳細</returns>
     [HttpGet("students/me")]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetStudentMe()
@@ -120,7 +143,10 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 自分の教員プロフィール取得
+    /// <summary>
+    /// 【教員専用】自身のプロフィール情報を取得します
+    /// </summary>
+    /// <returns>教員プロフィール詳細</returns>
     [HttpGet("teachers/me")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> GetTeacherMe()
@@ -144,7 +170,11 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 自分の学生プロフィール更新
+    /// <summary>
+    /// 【学生専用】就活プロフィール情報を更新します
+    /// </summary>
+    /// <param name="request">更新内容</param>
+    /// <returns>成功レスポンス</returns>
     [HttpPatch("students/me/profile")]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateStudentProfileRequest request)
@@ -163,7 +193,11 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 就活状況更新
+    /// <summary>
+    /// 【学生専用】就活中フラグを更新します
+    /// </summary>
+    /// <param name="request">更新内容</param>
+    /// <returns>成功レスポンス</returns>
     [HttpPatch("students/me/job-hunting")]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> UpdateJobHuntingStatus([FromBody] UpdateJobHuntingStatusRequest request)
@@ -182,7 +216,11 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
-    // 自分の教員プロフィール更新
+    /// <summary>
+    /// 【教員専用】教員プロフィール情報を更新します
+    /// </summary>
+    /// <param name="request">更新内容</param>
+    /// <returns>成功レスポンス</returns>
     [HttpPatch("teachers/me/profile")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UpdateTeacherProfile([FromBody] UpdateTeacherProfileRequest request)
@@ -201,6 +239,9 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         });
     }
 
+    /// <summary>
+    /// 認証トークンのクレームから現在のアカウントIDを取得します
+    /// </summary>
     private long GetCurrentAccountId()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);

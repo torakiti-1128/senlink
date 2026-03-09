@@ -71,13 +71,13 @@ public class GlobalExceptionHandlerTests
 
     public static IEnumerable<object[]> GetExceptionTestCases()
     {
-        yield return new object[] { new BadRequestException(), 400 };
-        yield return new object[] { new Exception("System Error"), 500 };
+        yield return new object[] { new BadRequestException("The request is invalid."), 400, "BAD_REQUEST_ERROR" };
+        yield return new object[] { new Exception("System Error"), 500, "SERVER_ERROR" };
     }
 
     [Theory]
     [MemberData(nameof(GetExceptionTestCases))] 
-    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Exception exception, int expectedCode)
+    public async Task TryHandleAsync_ReturnsCorrectStatusAndFormat(Exception exception, int expectedCode, string expectedErrorType)
     {
         // Arrange
         var context = new DefaultHttpContext();
@@ -90,5 +90,16 @@ public class GlobalExceptionHandlerTests
         // Assert
         Assert.True(result);
         Assert.Equal(expectedCode, context.Response.StatusCode);
+
+        // レスポンスボディの形式を検証
+        responseStream.Position = 0;
+        using var reader = new StreamReader(responseStream);
+        var responseBody = await reader.ReadToEndAsync();
+        var apiResponse = JsonSerializer.Deserialize<ApiErrorResponse>(responseBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        Assert.NotNull(apiResponse);
+        Assert.False(apiResponse.Success);
+        Assert.Equal(expectedCode, apiResponse.Code);
+        Assert.Equal(expectedErrorType, apiResponse.Error.Type);
     }
 }

@@ -6,12 +6,18 @@ using SenLink.Service.Modules.School.Interfaces;
 
 namespace SenLink.Service.Modules.School.Services;
 
+/// <summary>
+/// 学校情報およびプロフィール管理サービスのビジネスロジックを実装します
+/// </summary>
 public class SchoolService(
     IDepartmentRepository departmentRepository,
     IClassRepository classRepository,
     IStudentRepository studentRepository,
     ITeacherRepository teacherRepository) : ISchoolService
 {
+    /// <summary>
+    /// すべての学科を取得します
+    /// </summary>
     public async Task<DepartmentListResponse> GetDepartmentsAsync()
     {
         var departments = await departmentRepository.GetAllAsync();
@@ -20,24 +26,27 @@ public class SchoolService(
         );
     }
 
+    /// <summary>
+    /// 条件に合致するクラスを取得します
+    /// </summary>
     public async Task<ClassListResponse> GetClassesAsync(long? departmentId, int? fiscalYear, int? grade)
     {
         var classes = await classRepository.GetFilteredAsync(departmentId, fiscalYear, grade);
         
-        var departments = await departmentRepository.GetAllAsync();
-        var deptDict = departments.ToDictionary(d => d.Id, d => d.Name);
-
         return new ClassListResponse(
             classes.Select(c => new ClassDto(
                 c.Id, 
                 c.DepartmentId, 
-                deptDict.GetValueOrDefault(c.DepartmentId, "Unknown"),
+                c.Department?.Name ?? "Unknown",
                 c.FiscalYear,
                 c.Grade,
                 c.Name)).ToList()
         );
     }
 
+    /// <summary>
+    /// 学生プロフィールを作成します。重複チェックを含みます。
+    /// </summary>
     public async Task<StudentProfileCreatedResponse> CreateStudentProfileAsync(long accountId, CreateStudentProfileOnboardingRequest request)
     {
         // アカウントごとの重複チェック
@@ -71,6 +80,9 @@ public class SchoolService(
             student.IsJobHunting);
     }
 
+    /// <summary>
+    /// 教員プロフィールを作成します。重複チェックを含みます。
+    /// </summary>
     public async Task<TeacherProfileCreatedResponse> CreateTeacherProfileAsync(long accountId, CreateTeacherProfileOnboardingRequest request)
     {
         var existing = await teacherRepository.GetByAccountIdAsync(accountId);
@@ -90,6 +102,9 @@ public class SchoolService(
         return new TeacherProfileCreatedResponse(teacher.Id, teacher.AccountId);
     }
 
+    /// <summary>
+    /// 現在のアカウントIDに紐づく学生プロフィールを取得します
+    /// </summary>
     public async Task<StudentMeResponse?> GetStudentMeAsync(long accountId)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
@@ -117,6 +132,9 @@ public class SchoolService(
             student.ProfileData);
     }
 
+    /// <summary>
+    /// 現在のアカウントIDに紐づく教員プロフィールを取得します
+    /// </summary>
     public async Task<TeacherMeResponse?> GetTeacherMeAsync(long accountId)
     {
         var teacher = await teacherRepository.GetByAccountIdAsync(accountId);
@@ -132,6 +150,9 @@ public class SchoolService(
             teacher.ProfileData);
     }
 
+    /// <summary>
+    /// 学生の就活プロフィールを更新します
+    /// </summary>
     public async Task<bool> UpdateStudentProfileAsync(long accountId, UpdateStudentProfileRequest request)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
@@ -146,6 +167,9 @@ public class SchoolService(
         return true;
     }
 
+    /// <summary>
+    /// 学生の就活中フラグを更新します
+    /// </summary>
     public async Task<bool> UpdateJobHuntingStatusAsync(long accountId, UpdateJobHuntingStatusRequest request)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
@@ -157,6 +181,9 @@ public class SchoolService(
         return true;
     }
 
+    /// <summary>
+    /// 教員のプロフィール情報を更新します
+    /// </summary>
     public async Task<bool> UpdateTeacherProfileAsync(long accountId, UpdateTeacherProfileRequest request)
     {
         var teacher = await teacherRepository.GetByAccountIdAsync(accountId);

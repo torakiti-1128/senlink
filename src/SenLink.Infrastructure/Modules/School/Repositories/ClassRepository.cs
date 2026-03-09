@@ -9,7 +9,9 @@ public class ClassRepository(SenLinkDbContext context) : IClassRepository
 {
     public async Task<List<Class>> GetFilteredAsync(long? departmentId, int? fiscalYear, int? grade)
     {
-        var query = context.Set<Class>().AsQueryable();
+        var query = context.Set<Class>()
+            .Include(x => x.Department) // 学科情報を結合
+            .AsQueryable();
 
         if (departmentId.HasValue)
             query = query.Where(x => x.DepartmentId == departmentId.Value);
@@ -25,6 +27,8 @@ public class ClassRepository(SenLinkDbContext context) : IClassRepository
 
     public async Task<Class?> GetByIdAsync(long id)
     {
-        return await context.Set<Class>().FindAsync(id);
+        return await context.Set<Class>()
+            .Include(x => x.Department)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 }
