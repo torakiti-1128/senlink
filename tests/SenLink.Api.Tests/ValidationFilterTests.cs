@@ -39,17 +39,17 @@ public class ValidationFilterTests
         // Assert
         var result = Assert.IsType<BadRequestObjectResult>(context.Result);
         
-        // 型安全に値を確認するためにリフレクションを使用
-        var response = result.Value;
-        Assert.NotNull(response);
+        // 新しい ApiErrorResponse 型として検証
+        var response = Assert.IsType<ApiErrorResponse>(result.Value);
         
-        var successProp = response.GetType().GetProperty("success");
-        var errorMessageProp = response.GetType().GetProperty("errorMessage");
+        Assert.False(response.Success);
+        Assert.Equal(400, response.Code);
+        Assert.Equal("One or more validation errors occurred.", response.Message);
+        Assert.NotNull(response.Error);
+        Assert.Equal("VALIDATION_ERROR", response.Error.Type);
         
-        Assert.NotNull(successProp);
-        Assert.NotNull(errorMessageProp);
-        
-        Assert.False((bool?)successProp.GetValue(response));
-        Assert.Equal("One or more validation errors occurred.", errorMessageProp.GetValue(response));
+        var error = Assert.Single(response.Error.Details!);
+        Assert.Equal("Name", error.Field);
+        Assert.Equal("Name is required", error.Reason);
     }
 }

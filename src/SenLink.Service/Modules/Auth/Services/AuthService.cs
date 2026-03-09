@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using SenLink.Domain.Modules.Auth.Entities;
 using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Service.Modules.Auth.DTOs;
@@ -44,33 +45,27 @@ public class AuthService(
     /// </summary>
     public async Task<bool> RegisterAsync(RegisterRequest request)
     {
-        // 1. ドメイン制限チェック（ドメイン層のルールを呼び出し）
+        // 重複チェック
+        var existing = await accountRepository.GetByEmailAsync(request.Email);
+        if (existing != null) return false;
+
+        // 設定から許可ドメインを取得
         var allowedDomainsStr = settingProvider.GetValue("AllowedEmailDomains") ?? "senlink.dev";
         var allowedDomains = allowedDomainsStr.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        
-        if (!Account.IsValidEmailDomain(request.Email, allowedDomains))
+
+        try
         {
+            // アカウント生成（ドメインルールやロール判定もここで行われる）
+            var account = Account.Create(request.Email, request.Password, allowedDomains);
+            
+            await accountRepository.AddAsync(account);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            // メールドメイン不正などのドメインルール違反
             return false;
         }
-
-        // 2. 重複チェック
-        var existing = await accountRepository.GetByEmailAsync(request.Email);
-        if (existing != null)
-        {
-            return false;
-        }
-
-        // 3. アカウント作成
-        var account = new Account
-        {
-            Email = request.Email,
-            Role = AccountRole.Student,
-            IsActive = true
-        };
-        account.SetPassword(request.Password);
-
-        await accountRepository.AddAsync(account);
-        return true;
     }
 
     /// <summary>
@@ -78,18 +73,17 @@ public class AuthService(
     /// </summary>
     public async Task<string> GenerateOtpAsync(string email)
     {
-        var code = new Random().Next(100000, 999999).ToString();
-        
-        var otp = new OneTimePassword
-        {
-            Email = email,
-            Code = code,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
-            Purpose = "Register"
-        };
+        // OTPコードの桁数を設定から取得（デフォルト6桁）
+        int optLength = int.TryParse(settingProvider.GetValue("OtpCodeLength"), out int length) ? length : 6;
 
+        // OTP生成
+        var otp = new OneTimePassword().CreateOTP(email, "Register", optLength);
+
+        // 既存のOTPがあれば無効化
         await otpRepository.AddAsync(otp);
-        return code;
+
+        // ToDo: 実際の運用ではここでメール送信処理を呼び出す
+        return otp.Code;
     }
 
     /// <summary>
@@ -126,11 +120,12 @@ public class AuthService(
         await otpRepository.AddAsync(otp);
         return token;
     }
-/// <summary>
-/// パスワードリセット実行
-/// </summary>
-public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
-{
+
+    /// <summary>
+    /// パスワードリセット実行
+    /// </summary>
+    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+    {
     // OneTimePasswordテーブルをトークン保存に流用
     var otp = await otpRepository.GetValidByTokenAsync(request.Token, "PasswordReset");
     if (otp == null) return false;

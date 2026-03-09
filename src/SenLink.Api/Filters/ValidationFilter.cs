@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Linq;
+using SenLink.Api.Models;
 
 namespace SenLink.Api.Filters
 {
@@ -16,16 +16,24 @@ namespace SenLink.Api.Filters
             {
                 var errors = context.ModelState
                     .Where(x => x.Value?.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
-                    );
+                    .SelectMany(kvp => kvp.Value!.Errors.Select(e => new ValidationErrorDetail
+                    {
+                        Field = kvp.Key,
+                        Reason = e.ErrorMessage
+                    }))
+                    .ToList();
 
-                var response = new
+                var response = new ApiErrorResponse
                 {
-                    success = false,
-                    data = errors, // どの項目がどうエラーなのかをDataに含める
-                    errorMessage = "One or more validation errors occurred."
+                    Success = false,
+                    Code = StatusCodes.Status400BadRequest,
+                    Message = "One or more validation errors occurred.",
+                    Operation = GetOperationName(context.HttpContext),
+                    Error = new ErrorDetail
+                    {
+                        Type = "VALIDATION_ERROR",
+                        Details = errors
+                    }
                 };
 
                 context.Result = new BadRequestObjectResult(response);
@@ -33,5 +41,11 @@ namespace SenLink.Api.Filters
         }
 
         public void OnActionExecuted(ActionExecutedContext context) { }
+
+        private string GetOperationName(HttpContext context)
+        {
+            var action = context.Request.RouteValues["action"]?.ToString();
+            return action ?? context.Request.Path.Value?.Trim('/').Replace("/", "_") ?? "unknown_operation";
+        }
     }
 }

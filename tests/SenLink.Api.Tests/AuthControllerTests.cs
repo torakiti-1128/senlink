@@ -54,6 +54,11 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
             });
             await context.SaveChangesAsync();
         }
+
+        // キャッシュをロード（リロード）
+        var provider = scope.ServiceProvider.GetRequiredService<SenLink.Service.Modules.Maintenance.Services.SystemSettingProvider>();
+        var repository = scope.ServiceProvider.GetRequiredService<SenLink.Domain.Maintenance.Repositories.ISystemSettingRepository>();
+        await provider.LoadCacheAsync(repository);
     }
 
     [Fact]
