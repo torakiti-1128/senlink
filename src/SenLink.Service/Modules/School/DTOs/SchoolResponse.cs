@@ -36,7 +36,7 @@ public record StudentMeResponse(
     short Gender,
     int AdmissionYear,
     bool IsJobHunting,
-    object? ProfileData);
+    StudentProfileDataDto? ProfileData);
 
 public record TeacherMeResponse(
     long TeacherId,

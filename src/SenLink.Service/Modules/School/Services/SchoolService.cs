@@ -15,9 +15,6 @@ public class SchoolService(
     IStudentRepository studentRepository,
     ITeacherRepository teacherRepository) : ISchoolService
 {
-    /// <summary>
-    /// すべての学科を取得します
-    /// </summary>
     public async Task<DepartmentListResponse> GetDepartmentsAsync()
     {
         var departments = await departmentRepository.GetAllAsync();
@@ -26,9 +23,6 @@ public class SchoolService(
         );
     }
 
-    /// <summary>
-    /// 条件に合致するクラスを取得します
-    /// </summary>
     public async Task<ClassListResponse> GetClassesAsync(long? departmentId, int? fiscalYear, int? grade)
     {
         var classes = await classRepository.GetFilteredAsync(departmentId, fiscalYear, grade);
@@ -44,16 +38,11 @@ public class SchoolService(
         );
     }
 
-    /// <summary>
-    /// 学生プロフィールを作成します。重複チェックを含みます。
-    /// </summary>
     public async Task<StudentProfileCreatedResponse> CreateStudentProfileAsync(long accountId, CreateStudentProfileOnboardingRequest request)
     {
-        // アカウントごとの重複チェック
         var existingByAccount = await studentRepository.GetByAccountIdAsync(accountId);
         if (existingByAccount != null) return null!;
 
-        // 学籍番号の重複チェック
         var existingByNumber = await studentRepository.GetByStudentNumberAsync(request.StudentNumber);
         if (existingByNumber != null) return null!;
 
@@ -67,7 +56,8 @@ public class SchoolService(
             DateOfBirth = DateOnly.FromDateTime(request.DateOfBirth),
             Gender = (Gender)request.Gender,
             AdmissionYear = request.AdmissionYear,
-            IsJobHunting = true
+            IsJobHunting = request.IsJobHunting,
+            ProfileData = MapToEntity(request.ProfileData, request.Pr)
         };
 
         await studentRepository.AddAsync(student);
@@ -80,9 +70,6 @@ public class SchoolService(
             student.IsJobHunting);
     }
 
-    /// <summary>
-    /// 教員プロフィールを作成します。重複チェックを含みます。
-    /// </summary>
     public async Task<TeacherProfileCreatedResponse> CreateTeacherProfileAsync(long accountId, CreateTeacherProfileOnboardingRequest request)
     {
         var existing = await teacherRepository.GetByAccountIdAsync(accountId);
@@ -102,9 +89,6 @@ public class SchoolService(
         return new TeacherProfileCreatedResponse(teacher.Id, teacher.AccountId);
     }
 
-    /// <summary>
-    /// 現在のアカウントIDに紐づく学生プロフィールを取得します
-    /// </summary>
     public async Task<StudentMeResponse?> GetStudentMeAsync(long accountId)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
@@ -129,12 +113,9 @@ public class SchoolService(
             (short)student.Gender,
             student.AdmissionYear,
             student.IsJobHunting,
-            student.ProfileData);
+            MapToDto(student.ProfileData));
     }
 
-    /// <summary>
-    /// 現在のアカウントIDに紐づく教員プロフィールを取得します
-    /// </summary>
     public async Task<TeacherMeResponse?> GetTeacherMeAsync(long accountId)
     {
         var teacher = await teacherRepository.GetByAccountIdAsync(accountId);
@@ -150,26 +131,17 @@ public class SchoolService(
             teacher.ProfileData);
     }
 
-    /// <summary>
-    /// 学生の就活プロフィールを更新します
-    /// </summary>
     public async Task<bool> UpdateStudentProfileAsync(long accountId, UpdateStudentProfileRequest request)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
         if (student == null) return false;
 
-        student.ProfileData ??= new StudentProfile();
-        student.ProfileData.Pr = request.Pr;
-        student.ProfileData.Certifications = request.Certifications;
-        student.ProfileData.Links = request.Links;
+        student.ProfileData = MapToEntity(request.ProfileData, request.Pr, request.Certifications, request.Links);
 
         await studentRepository.UpdateAsync(student);
         return true;
     }
 
-    /// <summary>
-    /// 学生の就活中フラグを更新します
-    /// </summary>
     public async Task<bool> UpdateJobHuntingStatusAsync(long accountId, UpdateJobHuntingStatusRequest request)
     {
         var student = await studentRepository.GetByAccountIdAsync(accountId);
@@ -181,9 +153,6 @@ public class SchoolService(
         return true;
     }
 
-    /// <summary>
-    /// 教員のプロフィール情報を更新します
-    /// </summary>
     public async Task<bool> UpdateTeacherProfileAsync(long accountId, UpdateTeacherProfileRequest request)
     {
         var teacher = await teacherRepository.GetByAccountIdAsync(accountId);
@@ -198,5 +167,89 @@ public class SchoolService(
 
         await teacherRepository.UpdateAsync(teacher);
         return true;
+    }
+
+    private static StudentProfile MapToEntity(StudentProfileDataDto? dto, string? pr = null, string? certs = null, string? links = null)
+    {
+        var entity = new StudentProfile
+        {
+            Pr = pr,
+            Certifications = certs,
+            Links = links
+        };
+
+        if (dto == null) return entity;
+
+        entity.AcademicHistories = dto.AcademicHistories?.Select(a => new AcademicHistory
+        {
+            SchoolName = a.SchoolName,
+            Faculty = a.Faculty,
+            StartDate = a.StartDate,
+            EndDate = a.EndDate,
+            Status = a.Status
+        }).ToList();
+
+        entity.WorkHistories = dto.WorkHistories?.Select(w => new WorkHistory
+        {
+            Type = w.Type,
+            Organization = w.Organization,
+            Role = w.Role,
+            Content = w.Content,
+            StartDate = w.StartDate,
+            EndDate = w.EndDate
+        }).ToList();
+
+        entity.CertificationDetails = dto.CertificationDetails?.Select(c => new CertificationDetail
+        {
+            Name = c.Name,
+            Date = c.Date
+        }).ToList();
+
+        if (dto.Skills != null)
+        {
+            entity.Skills = new SkillSet
+            {
+                Languages = dto.Skills.Languages,
+                Frameworks = dto.Skills.Frameworks,
+                Others = dto.Skills.Others
+            };
+        }
+
+        if (dto.SocialLinks != null)
+        {
+            entity.SocialLinks = new SocialLinks
+            {
+                Github = dto.SocialLinks.Github,
+                Portfolio = dto.SocialLinks.Portfolio,
+                Blog = dto.SocialLinks.Blog,
+                Twitter = dto.SocialLinks.Twitter
+            };
+        }
+
+        if (dto.SelfPromotion != null)
+        {
+            entity.SelfPromotion = new SelfPromotionDetail
+            {
+                Catchphrase = dto.SelfPromotion.Catchphrase,
+                Content = dto.SelfPromotion.Content,
+                Strengths = dto.SelfPromotion.Strengths
+            };
+        }
+
+        return entity;
+    }
+
+    private static StudentProfileDataDto? MapToDto(StudentProfile? entity)
+    {
+        if (entity == null) return null;
+
+        return new StudentProfileDataDto(
+            AcademicHistories: entity.AcademicHistories?.Select(a => new AcademicHistoryDto(a.SchoolName, a.Faculty, a.StartDate, a.EndDate, a.Status)).ToList(),
+            WorkHistories: entity.WorkHistories?.Select(w => new WorkHistoryDto(w.Type, w.Organization, w.Role, w.Content, w.StartDate, w.EndDate)).ToList(),
+            CertificationDetails: entity.CertificationDetails?.Select(c => new CertificationDetailDto(c.Name, c.Date)).ToList(),
+            Skills: entity.Skills != null ? new SkillSetDto(entity.Skills.Languages, entity.Skills.Frameworks, entity.Skills.Others) : null,
+            SocialLinks: entity.SocialLinks != null ? new SocialLinksDto(entity.SocialLinks.Github, entity.SocialLinks.Portfolio, entity.SocialLinks.Blog, entity.SocialLinks.Twitter) : null,
+            SelfPromotion: entity.SelfPromotion != null ? new SelfPromotionDetailDto(entity.SelfPromotion.Catchphrase, entity.SelfPromotion.Content, entity.SelfPromotion.Strengths) : null
+        );
     }
 }
