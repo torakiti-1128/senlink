@@ -6,6 +6,7 @@ using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Service.Modules.Maintenance.Interfeces;
 using SenLink.Service.Common.Interfaces;
+using SenLink.Domain.Modules.School.Repositories;
 
 namespace SenLink.Service.Modules.Auth.Services;
 
@@ -15,7 +16,9 @@ public class AuthService(
     IOneTimePasswordRepository otpRepository,
     ITokenService tokenService,
     ISystemSettingProvider settingProvider,
-    IEmailSender emailSender) : IAuthService
+    IEmailSender emailSender,
+    IStudentRepository studentRepository,
+    ITeacherRepository teacherRepository) : IAuthService
 {
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
@@ -37,6 +40,19 @@ public class AuthService(
 
         if (!isSuccess) return null;
 
+        // プロフィールの有無を確認
+        bool hasProfile = false;
+        if (account.Role == AccountRole.Student)
+        {
+            var student = await studentRepository.GetByAccountIdAsync(account.Id);
+            hasProfile = student != null;
+        }
+        else if (account.Role == AccountRole.Teacher)
+        {
+            var teacher = await teacherRepository.GetByAccountIdAsync(account.Id);
+            hasProfile = teacher != null;
+        }
+
         var token = tokenService.CreateToken(account);
         
         return new AuthResponse(
@@ -44,7 +60,8 @@ public class AuthService(
             ExpiresAt: DateTime.UtcNow.AddMinutes(1440), 
             UserId: account.Id,
             Email: account.Email,
-            Role: account.Role.ToString()
+            Role: account.Role.ToString(),
+            HasProfile: hasProfile
         );
     }
 
@@ -92,13 +109,27 @@ public class AuthService(
         var account = await accountRepository.GetByEmailAsync(request.Email);
         if (account == null) return null;
 
+        // 検証成功時もプロフィールの有無を返す
+        bool hasProfile = false;
+        if (account.Role == AccountRole.Student)
+        {
+            var student = await studentRepository.GetByAccountIdAsync(account.Id);
+            hasProfile = student != null;
+        }
+        else if (account.Role == AccountRole.Teacher)
+        {
+            var teacher = await teacherRepository.GetByAccountIdAsync(account.Id);
+            hasProfile = teacher != null;
+        }
+
         var token = tokenService.CreateToken(account);
         return new AuthResponse(
             Token: token,
             ExpiresAt: DateTime.UtcNow.AddMinutes(1440),
             UserId: account.Id,
             Email: account.Email,
-            Role: account.Role.ToString()
+            Role: account.Role.ToString(),
+            HasProfile: hasProfile
         );
     }
 
@@ -112,10 +143,7 @@ public class AuthService(
 
     public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
     {
-        // 修正: 検証済み(IsUsed=true)であっても有効期限内なら許可する
         var otp = await otpRepository.GetAnyByTokenAsync(request.Token, "PasswordReset");
-        
-        // OTPが見つからない、またはメールアドレスが一致しない場合はエラー
         if (otp == null || otp.Email != request.Email) return false;
 
         var account = await accountRepository.GetByEmailAsync(otp.Email);
@@ -124,7 +152,6 @@ public class AuthService(
         account.SetPassword(request.NewPassword);
         await accountRepository.UpdateAsync(account);
 
-        // 念のため再度使用済みとして更新（既になっていればそのまま）
         otp.IsUsed = true;
         await otpRepository.UpdateAsync(otp);
         return true;
