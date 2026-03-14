@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Service.Modules.Auth.Services;
+using SenLink.Shared.Constants;
 using System.Text;
 
 /// <summary>
@@ -15,6 +16,14 @@ public static class IdentityServiceExtensions
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddScoped<ITokenService, TokenService>();
+
+        // 認可ポリシーの設定
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthPolicies.RequireStudent, policy => policy.RequireRole("Student", "Admin"));
+            options.AddPolicy(AuthPolicies.RequireTeacher, policy => policy.RequireRole("Teacher", "Admin"));
+            options.AddPolicy(AuthPolicies.RequireAdmin, policy => policy.RequireRole("Admin"));
+        });
 
         /// JWT認証を追加
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

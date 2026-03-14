@@ -1,4 +1,5 @@
 using SenLink.Api.Models;
+using SenLink.Shared.Models;
 
 namespace SenLink.Api.Middlewares
 {

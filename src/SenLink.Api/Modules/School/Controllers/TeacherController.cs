@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 using SenLink.Api.Models;
-using SenLink.Api.Middlewares;
+using SenLink.Api.Extensions;
+using SenLink.Shared.Constants;
 using System.Security.Claims;
+using System.Net;
 
 namespace SenLink.Api.Modules.School.Controllers;
 
@@ -22,24 +24,21 @@ public class TeacherController(ISchoolService schoolService) : ControllerBase
     /// <param name="request">登録内容</param>
     /// <returns>作成されたプロフィール情報</returns>
     [HttpPost("onboarding")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Policy = AuthPolicies.RequireTeacher)]
     public async Task<IActionResult> CreateTeacherProfile([FromBody] CreateTeacherProfileOnboardingRequest request)
     {
         long accountId = GetCurrentAccountId();
-        var response = await schoolService.CreateTeacherProfileAsync(accountId, request);
+        var result = await schoolService.CreateTeacherProfileAsync(accountId, request);
 
-        if (response == null)
-        {
-            throw new ConflictException("Teacher profile already exists.");
-        }
+        if (!result.IsSuccess) return result.ToActionResult("SCHOOL_TEACHER_ONBOARDING_CREATE");
 
         return Created("", new ApiResponse<TeacherProfileCreatedResponse>
         {
             Success = true,
-            Code = StatusCodes.Status201Created,
-            Message = "Teacher profile created",
+            Code = (int)HttpStatusCode.Created,
+            Message = result.Message,
             Operation = "SCHOOL_TEACHER_ONBOARDING_CREATE",
-            Data = response
+            Data = result.Data
         });
     }
 
@@ -48,25 +47,12 @@ public class TeacherController(ISchoolService schoolService) : ControllerBase
     /// </summary>
     /// <returns>教員プロフィール詳細</returns>
     [HttpGet("me")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Policy = AuthPolicies.RequireTeacher)]
     public async Task<IActionResult> GetTeacherMe()
     {
         long accountId = GetCurrentAccountId();
-        var response = await schoolService.GetTeacherMeAsync(accountId);
-
-        if (response == null)
-        {
-            throw new NotFoundException("Teacher profile not found.");
-        }
-
-        return Ok(new ApiResponse<TeacherMeResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "OK",
-            Operation = "SCHOOL_TEACHER_ME_GET",
-            Data = response
-        });
+        var result = await schoolService.GetTeacherMeAsync(accountId);
+        return result.ToActionResult("SCHOOL_TEACHER_ME_GET");
     }
 
     /// <summary>
@@ -75,21 +61,12 @@ public class TeacherController(ISchoolService schoolService) : ControllerBase
     /// <param name="request">更新内容</param>
     /// <returns>成功レスポンス</returns>
     [HttpPatch("me/profile")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Policy = AuthPolicies.RequireTeacher)]
     public async Task<IActionResult> UpdateTeacherProfile([FromBody] UpdateTeacherProfileRequest request)
     {
         long accountId = GetCurrentAccountId();
-        var success = await schoolService.UpdateTeacherProfileAsync(accountId, request);
-
-        if (!success) throw new NotFoundException("Teacher profile not found.");
-
-        return Ok(new ApiResponse<object>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Profile updated",
-            Operation = "SCHOOL_TEACHER_ME_PROFILE_UPDATE"
-        });
+        var result = await schoolService.UpdateTeacherProfileAsync(accountId, request);
+        return result.ToActionResult("SCHOOL_TEACHER_ME_PROFILE_UPDATE");
     }
 
     private long GetCurrentAccountId()

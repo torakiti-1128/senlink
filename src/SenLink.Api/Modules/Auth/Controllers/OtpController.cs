@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Api.Models;
-using SenLink.Api.Middlewares;
+using SenLink.Api.Extensions;
+using SenLink.Shared.Results;
 
 namespace SenLink.Api.Modules.Auth.Controllers;
 
@@ -11,44 +12,29 @@ namespace SenLink.Api.Modules.Auth.Controllers;
 public class OtpController(IAuthService authService) : ControllerBase
 {
     [HttpPost("request")]
-    public async Task<IActionResult> RequestOtp([FromBody] OtpRequestDto request)
+    public async Task<IActionResult> RequestOtp([FromBody] RequestOtpRequest request)
     {
-        var code = await authService.GenerateOtpAsync(request.Email, request.Purpose);
+        var result = await authService.GenerateOtpAsync(request.Email, request.Purpose);
         
+        if (!result.IsSuccess) return result.ToActionResult("AUTH_OTP_REQUEST");
+
         return Ok(new ApiResponse<object>
         {
             Success = true,
-            Code = StatusCodes.Status200OK,
+            Code = (int)result.StatusCode,
             Message = "OTP sent.",
             Operation = "AUTH_OTP_REQUEST",
 #if DEBUG
-            Data = new { Otp = code }
+            Data = new { Otp = result.Data }
 #endif
         });
     }
 
     [HttpPost("verify")]
-    public async Task<IActionResult> VerifyOtp([FromBody] OtpVerifyRequestDto request)
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
     {
-        var authResponse = await authService.VerifyOtpAndLoginAsync(
-            new VerifyOtpRequest(request.Email, request.Otp), 
-            request.Purpose);
+        var result = await authService.VerifyOtpAndLoginAsync(request, request.Purpose);
 
-        if (authResponse == null)
-        {
-            throw new BadRequestException("Invalid or expired OTP.");
-        }
-
-        return Ok(new ApiResponse<AuthResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "OTP verified.",
-            Operation = "AUTH_OTP_VERIFY",
-            Data = authResponse
-        });
+        return result.ToActionResult("AUTH_OTP_VERIFY");
     }
 }
-
-public record OtpRequestDto(string Email, string Purpose);
-public record OtpVerifyRequestDto(string Email, string Otp, string Purpose);

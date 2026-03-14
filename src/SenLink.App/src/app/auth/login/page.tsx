@@ -50,12 +50,18 @@ export default function LoginPage() {
       });
 
       if (response.data && response.data.success) {
-        const { token, role } = response.data.data;
+        const { token, role, hasProfile, email } = response.data.data;
         localStorage.setItem("auth_token", token);
         localStorage.setItem("user_role", role);
+        localStorage.setItem("user_email", email); // 追加
         
-        toast.success("ログインしました");
-        router.push("/dashboard");
+        if (hasProfile) {
+          toast.success("ログインしました");
+          router.push("/dashboard");
+        } else {
+          toast.info("初期プロフィールの設定が必要です");
+          router.push("/auth/onboarding");
+        }
       }
     } catch (error: any) {
       const message = error.response?.data?.message || "ログインに失敗しました";

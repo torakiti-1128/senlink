@@ -47,12 +47,15 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         
-        if (!await context.Departments.AnyAsync())
+        if (!await context.Departments.AnyAsync(d => d.Code == "INF"))
         {
             context.Departments.Add(new Department { Name = "情報", Code = "INF" });
-            context.Departments.Add(new Department { Name = "機械", Code = "MEC" });
-            await context.SaveChangesAsync();
         }
+        if (!await context.Departments.AnyAsync(d => d.Code == "MEC"))
+        {
+            context.Departments.Add(new Department { Name = "機械", Code = "MEC" });
+        }
+        await context.SaveChangesAsync();
     }
 
     private void SetAuthHeader(long accountId, string role = "Student")
@@ -77,7 +80,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         var result = await response.Content.ReadFromJsonAsync<ApiResponse<DepartmentListResponse>>();
         
         Assert.NotNull(result?.Data);
-        Assert.Equal(2, result.Data.Items.Count);
+        Assert.True(result.Data.Items.Count >= 2);
         Assert.Contains(result.Data.Items, d => d.Code == "INF");
     }
 
@@ -91,8 +94,8 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         var dept = await context.Departments.FirstAsync(d => d.Code == "INF");
         
-        context.Classes.Add(new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "A組" });
-        context.Classes.Add(new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "B組" });
+        context.Classes.Add(new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = (short)3, Name = "A組" });
+        context.Classes.Add(new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = (short)3, Name = "B組" });
         await context.SaveChangesAsync();
 
         // Act
@@ -116,29 +119,29 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         var dept = await context.Departments.FirstAsync();
-        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "A組" };
+        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = (short)3, Name = "A組" };
         context.Classes.Add(@class);
         
         // テスト用アカウント
-        var account = new Account { Email = "student-test@senlink.dev", Role = AccountRole.Student };
-        account.SetPassword("Password123!");
+        var account = Account.Create("12345678@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
         var request = new {
             classId = @class.Id,
-            studentNumber = "1234567",
+            studentNumber = "12345678",
             name = "山田 太郎",
             nameKana = "やまだ たろう",
             dateOfBirth = "2007-04-01",
             gender = 1,
-            admissionYear = 2026
+            admissionYear = 2026,
+            isJobHunting = true
         };
 
         SetAuthHeader(account.Id, "Student");
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/v1/school/onboarding/student-profile", request);
+        var response = await _client.PostAsJsonAsync("/api/v1/school/students/onboarding", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -152,22 +155,22 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         var dept = await context.Departments.FirstAsync();
-        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "A組" };
+        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = (short)3, Name = "A組" };
         context.Classes.Add(@class);
         
-        var account = new Account { Email = "me-test@senlink.dev", Role = AccountRole.Student };
-        account.SetPassword("Password123!");
+        var account = Account.Create("me-test@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
         // プロフィールをあらかじめ作成
-        var student = new Student {
+        var student = new Student
+        {
             AccountId = account.Id,
             ClassId = @class.Id,
-            StudentNumber = "9999999",
-            Name = "私",
-            NameKana = "わたし",
-            DateOfBirth = new DateOnly(2000, 1, 1),
+            StudentNumber = "12345678",
+            Name = "山田 太郎",
+            NameKana = "やまだ たろう",
+            DateOfBirth = new DateOnly(2007, 4, 1),
             AdmissionYear = 2026
         };
         context.Students.Add(student);
@@ -182,7 +185,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = await response.Content.ReadFromJsonAsync<ApiResponse<StudentMeResponse>>();
         Assert.NotNull(result?.Data);
-        Assert.Equal("9999999", result.Data.StudentNumber);
+        Assert.Equal("12345678", result.Data.StudentNumber);
     }
 
     [Fact]
@@ -192,8 +195,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         
-        var account = new Account { Email = "teacher-test@senlink.dev", Role = AccountRole.Teacher };
-        account.SetPassword("Password123!");
+        var account = Account.Create("teacher-test@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
@@ -207,7 +209,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         SetAuthHeader(account.Id, "Teacher");
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/v1/school/onboarding/teacher-profile", request);
+        var response = await _client.PostAsJsonAsync("/api/v1/school/teachers/onboarding", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -220,8 +222,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         
-        var account = new Account { Email = "teacher-me@senlink.dev", Role = AccountRole.Teacher };
-        account.SetPassword("Password123!");
+        var account = Account.Create("teacher-me@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
@@ -255,11 +256,10 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         var dept = await context.Departments.FirstAsync();
-        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = 3, Name = "A組" };
+        var @class = new Class { DepartmentId = dept.Id, FiscalYear = 2026, Grade = (short)3, Name = "A組" };
         context.Classes.Add(@class);
         
-        var account = new Account { Email = "update-test@senlink.dev", Role = AccountRole.Student };
-        account.SetPassword("Password123!");
+        var account = Account.Create("update-test@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
@@ -303,8 +303,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         
-        var account = new Account { Email = "jh-test@senlink.dev", Role = AccountRole.Student };
-        account.SetPassword("Password123!");
+        var account = Account.Create("jh-test@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 

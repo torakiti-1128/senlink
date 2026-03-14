@@ -14,7 +14,7 @@ public class CreateStudentProfileValidator : AbstractValidator<CreateStudentProf
         
         RuleFor(x => x.StudentNumber)
             .NotEmpty()
-            .Matches(@"^\d{7}$").WithMessage("Student number must be 7 digits.");
+            .Matches(@"^\d{8}$").WithMessage("Student number must be 8 digits.");
 
         RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
         RuleFor(x => x.NameKana).NotEmpty().MaximumLength(100);

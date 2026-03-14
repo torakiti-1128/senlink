@@ -4,4 +4,5 @@ public record AuthResponse(
     DateTime ExpiresAt, 
     long UserId, 
     string Email, 
-    string Role);
+    string Role,
+    bool HasProfile = false);

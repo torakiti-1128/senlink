@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SenLink.Api.Models;
+using SenLink.Shared.Models;
 
 namespace SenLink.Api.Filters
 {
@@ -45,7 +46,8 @@ namespace SenLink.Api.Filters
         private string GetOperationName(HttpContext context)
         {
             var action = context.Request.RouteValues["action"]?.ToString();
-            return action ?? context.Request.Path.Value?.Trim('/').Replace("/", "_") ?? "unknown_operation";
+            var name = action ?? context.Request.Path.Value?.Trim('/').Replace("/", "_") ?? "UNKNOWN_OPERATION";
+            return name.ToUpperInvariant();
         }
     }
 }

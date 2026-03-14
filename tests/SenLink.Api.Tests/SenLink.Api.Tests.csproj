@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\SenLink.Api\SenLink.Api.csproj" />
     <ProjectReference Include="..\..\src\SenLink.Service\SenLink.Service.csproj" />
+    <ProjectReference Include="..\..\src\SenLink.Shared\SenLink.Shared.csproj" />
   </ItemGroup>
 
 </Project>

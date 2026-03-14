@@ -70,10 +70,10 @@ function OtpContent() {
           if (authData && authData.token) {
             localStorage.setItem("auth_token", authData.token);
             localStorage.setItem("user_role", authData.role);
-            toast.success("認証が完了しました");
-            router.push("/dashboard");
+            localStorage.setItem("user_email", authData.email); // 追加
+            toast.success("認証が完了しました。プロフィールの設定を始めましょう。");
+            router.push("/auth/onboarding");
           } else {
-            // トークンがない場合は再ログインを促す
             toast.success("認証が完了しました。ログインしてください。");
             router.push("/auth/login");
           }

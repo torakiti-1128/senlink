@@ -48,7 +48,8 @@ public class ValidationFilterTests
         Assert.NotNull(response.Error);
         Assert.Equal("VALIDATION_ERROR", response.Error.Type);
         
-        var error = Assert.Single(response.Error.Details!);
+        var details = Assert.IsType<List<ValidationErrorDetail>>(response.Error.Details);
+        var error = Assert.Single(details);
         Assert.Equal("Name", error.Field);
         Assert.Equal("Name is required", error.Reason);
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 using SenLink.Api.Models;
+using SenLink.Api.Extensions;
 
 namespace SenLink.Api.Modules.School.Controllers;
 
@@ -21,16 +22,8 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
     [HttpGet("departments")]
     public async Task<IActionResult> GetDepartments()
     {
-        var response = await schoolService.GetDepartmentsAsync();
-        
-        return Ok(new ApiResponse<DepartmentListResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "OK",
-            Operation = "SCHOOL_DEPARTMENTS_LIST",
-            Data = response
-        });
+        var result = await schoolService.GetDepartmentsAsync();
+        return result.ToActionResult("SCHOOL_DEPARTMENTS_LIST");
     }
 
     /// <summary>
@@ -46,15 +39,7 @@ public class SchoolController(ISchoolService schoolService) : ControllerBase
         [FromQuery] int? fiscalYear, 
         [FromQuery] int? grade)
     {
-        var response = await schoolService.GetClassesAsync(departmentId, fiscalYear, grade);
-
-        return Ok(new ApiResponse<ClassListResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "OK",
-            Operation = "SCHOOL_CLASSES_LIST",
-            Data = response
-        });
+        var result = await schoolService.GetClassesAsync(departmentId, fiscalYear, grade);
+        return result.ToActionResult("SCHOOL_CLASSES_LIST");
     }
 }
