@@ -14,3 +14,5 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Abstractions;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Routing;
+global using SenLink.Shared.Models;
+global using SenLink.Shared.Results;

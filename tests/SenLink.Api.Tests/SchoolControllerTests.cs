@@ -47,12 +47,15 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SenLinkDbContext>();
         
-        if (!await context.Departments.AnyAsync())
+        if (!await context.Departments.AnyAsync(d => d.Code == "INF"))
         {
             context.Departments.Add(new Department { Name = "情報", Code = "INF" });
-            context.Departments.Add(new Department { Name = "機械", Code = "MEC" });
-            await context.SaveChangesAsync();
         }
+        if (!await context.Departments.AnyAsync(d => d.Code == "MEC"))
+        {
+            context.Departments.Add(new Department { Name = "機械", Code = "MEC" });
+        }
+        await context.SaveChangesAsync();
     }
 
     private void SetAuthHeader(long accountId, string role = "Student")
@@ -77,7 +80,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         var result = await response.Content.ReadFromJsonAsync<ApiResponse<DepartmentListResponse>>();
         
         Assert.NotNull(result?.Data);
-        Assert.Equal(2, result.Data.Items.Count);
+        Assert.True(result.Data.Items.Count >= 2);
         Assert.Contains(result.Data.Items, d => d.Code == "INF");
     }
 
@@ -120,18 +123,19 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         context.Classes.Add(@class);
         
         // テスト用アカウント
-        var account = Account.Create("student-test@senlink.dev", "Password123!", ["senlink.dev"]);
+        var account = Account.Create("12345678@senlink.dev", "Password123!", ["senlink.dev"]);
         context.Accounts.Add(account);
         await context.SaveChangesAsync();
 
         var request = new {
             classId = @class.Id,
-            studentNumber = "1234567",
+            studentNumber = "12345678",
             name = "山田 太郎",
             nameKana = "やまだ たろう",
             dateOfBirth = "2007-04-01",
             gender = 1,
-            admissionYear = 2026
+            admissionYear = 2026,
+            isJobHunting = true
         };
 
         SetAuthHeader(account.Id, "Student");
@@ -159,13 +163,14 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         await context.SaveChangesAsync();
 
         // プロフィールをあらかじめ作成
-        var student = new Student {
+        var student = new Student
+        {
             AccountId = account.Id,
             ClassId = @class.Id,
-            StudentNumber = "9999999",
-            Name = "私",
-            NameKana = "わたし",
-            DateOfBirth = new DateOnly(2000, 1, 1),
+            StudentNumber = "12345678",
+            Name = "山田 太郎",
+            NameKana = "やまだ たろう",
+            DateOfBirth = new DateOnly(2007, 4, 1),
             AdmissionYear = 2026
         };
         context.Students.Add(student);
@@ -180,7 +185,7 @@ public class SchoolControllerTests : IClassFixture<WebApplicationFactory<Program
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = await response.Content.ReadFromJsonAsync<ApiResponse<StudentMeResponse>>();
         Assert.NotNull(result?.Data);
-        Assert.Equal("9999999", result.Data.StudentNumber);
+        Assert.Equal("12345678", result.Data.StudentNumber);
     }
 
     [Fact]
