@@ -4,6 +4,7 @@ using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 using SenLink.Api.Models;
 using SenLink.Api.Extensions;
+using SenLink.Shared.Constants;
 using System.Security.Claims;
 using System.Net;
 
@@ -23,7 +24,7 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     /// <param name="request">登録内容</param>
     /// <returns>作成されたプロフィール情報</returns>
     [HttpPost("onboarding")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Policy = AuthPolicies.RequireStudent)]
     public async Task<IActionResult> CreateStudentProfile([FromBody] CreateStudentProfileOnboardingRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -46,7 +47,7 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     /// </summary>
     /// <returns>学生プロフィール詳細</returns>
     [HttpGet("me")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Policy = AuthPolicies.RequireStudent)]
     public async Task<IActionResult> GetStudentMe()
     {
         long accountId = GetCurrentAccountId();
@@ -60,7 +61,7 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     /// <param name="request">更新内容</param>
     /// <returns>成功レスポンス</returns>
     [HttpPatch("me/profile")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Policy = AuthPolicies.RequireStudent)]
     public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateStudentProfileRequest request)
     {
         long accountId = GetCurrentAccountId();
@@ -74,7 +75,7 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     /// <param name="request">更新内容</param>
     /// <returns>成功レスポンス</returns>
     [HttpPatch("me/job-hunting")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Policy = AuthPolicies.RequireStudent)]
     public async Task<IActionResult> UpdateJobHuntingStatus([FromBody] UpdateJobHuntingStatusRequest request)
     {
         long accountId = GetCurrentAccountId();
