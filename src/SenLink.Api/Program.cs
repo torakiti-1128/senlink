@@ -75,6 +75,9 @@ try
     // アプリケーションビルド
     var app = builder.Build();
 
+    // 監査ログを記録 (全リクエストをキャッチ)
+    app.UseMiddleware<AuditLogMiddleware>();
+
     // Serilog による HTTP リクエストのアクセスログ記録
     app.UseSerilogRequestLogging();
 
@@ -115,6 +118,7 @@ try
     app.UseMiddleware<CampusIpRestriction>();
 
     // 認証・認可
+    app.UseAuthentication();
     app.UseAuthorization();
 
     // コントローラーのURLマッピング
