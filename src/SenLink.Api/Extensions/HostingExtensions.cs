@@ -22,6 +22,18 @@ public static class HostingExtensions
     /// </summary>
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
+        // CORS設定
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("DefaultPolicy", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000") // フロントエンドのURL
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
+
         // Serilog を DI コンテナに登録し、appsettings.json の設定を読み込む
         builder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
@@ -92,6 +104,7 @@ public static class HostingExtensions
         // 基本ミドルウェア
         app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseExceptionHandler();
+        app.UseCors("DefaultPolicy"); // CORSを有効化
         app.UseMiddleware<CampusIpRestriction>();
 
         // 認証・認可
