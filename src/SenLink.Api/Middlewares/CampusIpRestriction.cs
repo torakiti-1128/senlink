@@ -25,6 +25,13 @@ namespace SenLink.Api.Middlewares
         /// <exception cref="ForbiddenException"></exception>
         public async Task InvokeAsync(HttpContext context, ISystemSettingProvider provider)
         {
+            // OPTIONSリクエスト（CORSプリフライト）は制限をスキップ
+            if (context.Request.Method == HttpMethods.Options)
+            {
+                await _next(context);
+                return;
+            }
+
             var clientIp = context.Connection.RemoteIpAddress?.ToString();
             
             // サービス層のプロバイダーから設定値を取得
