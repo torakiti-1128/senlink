@@ -36,5 +36,6 @@ export interface TeacherProfileOnboardingRequest {
   nameKana: string;
   title?: string;
   officeLocation?: string;
+  assignedClasses: { classId: number; role: number }[];
   profileData?: any;
 }
