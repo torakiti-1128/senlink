@@ -8,4 +8,5 @@ public interface IOneTimePasswordRepository
     Task<OneTimePassword?> GetValidOtpAsync(string email, string code, string purpose);
     Task<OneTimePassword?> GetValidByTokenAsync(string token, string purpose);
     Task UpdateAsync(OneTimePassword otp);
+    Task<OneTimePassword?> GetAnyByTokenAsync(string token, string purpose);
 }

@@ -12,9 +12,6 @@ public static class IdentityServiceExtensions
     /// <summary>
     /// JWT認証を追加する拡張メソッド
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="config"></param>
-    /// <returns></returns>
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddScoped<ITokenService, TokenService>();
