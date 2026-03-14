@@ -40,6 +40,26 @@ public class Student : BaseEntity
 
     // クラスとのリレーション
     public Class Class { get; set; } = null!;
+
+    /// <summary>
+    /// 学生プロフィールのドメインルールを検証します
+    /// </summary>
+    /// <param name="accountEmail">ログイン中のメールアドレス</param>
+    public void Validate(string accountEmail)
+    {
+        // 1. 学生番号は8桁
+        if (StudentNumber.Length != 8 || !StudentNumber.All(char.IsDigit))
+        {
+            throw new ArgumentException("Student number must be exactly 8 digits.");
+        }
+
+        // 2. メールアドレスのユーザー名と学生番号が一致すること
+        var emailUsername = accountEmail.Split('@')[0];
+        if (emailUsername != StudentNumber)
+        {
+            throw new ArgumentException("Student number must match the email username.");
+        }
+    }
 }
 
 // 学生のプロフィールデータ構造定義

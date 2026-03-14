@@ -1,6 +1,7 @@
 using SenLink.Domain.Modules.School.Entities;
 using SenLink.Domain.Modules.School.Enums;
 using SenLink.Domain.Modules.School.Repositories;
+using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 
@@ -13,7 +14,8 @@ public class SchoolService(
     IDepartmentRepository departmentRepository,
     IClassRepository classRepository,
     IStudentRepository studentRepository,
-    ITeacherRepository teacherRepository) : ISchoolService
+    ITeacherRepository teacherRepository,
+    IAccountRepository accountRepository) : ISchoolService
 {
     public async Task<DepartmentListResponse> GetDepartmentsAsync()
     {
@@ -40,9 +42,15 @@ public class SchoolService(
 
     public async Task<StudentProfileCreatedResponse> CreateStudentProfileAsync(long accountId, CreateStudentProfileOnboardingRequest request)
     {
+        // 1. アカウント情報の取得（ドメインルール検証用）
+        var account = await accountRepository.GetByIdAsync(accountId);
+        if (account == null) return null!;
+
+        // 2. アカウントごとの重複チェック
         var existingByAccount = await studentRepository.GetByAccountIdAsync(accountId);
         if (existingByAccount != null) return null!;
 
+        // 3. 学籍番号の重複チェック
         var existingByNumber = await studentRepository.GetByStudentNumberAsync(request.StudentNumber);
         if (existingByNumber != null) return null!;
 
@@ -59,6 +67,9 @@ public class SchoolService(
             IsJobHunting = request.IsJobHunting,
             ProfileData = MapStudentToEntity(request.ProfileData, request.Pr)
         };
+
+        // 4. ドメインルールの検証
+        student.Validate(account.Email);
 
         await studentRepository.AddAsync(student);
 
