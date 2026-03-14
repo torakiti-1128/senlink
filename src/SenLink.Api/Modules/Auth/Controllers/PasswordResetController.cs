@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Api.Models;
-using SenLink.Api.Middlewares;
+using SenLink.Api.Extensions;
+using SenLink.Shared.Results;
 
 namespace SenLink.Api.Modules.Auth.Controllers;
 
@@ -19,16 +20,18 @@ public class PasswordResetController(IAuthService authService) : ControllerBase
     [HttpPost("request")]
     public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetRequest request)
     {
-        var code = await authService.RequestPasswordResetAsync(request.Email);
+        var result = await authService.RequestPasswordResetAsync(request.Email);
+
+        if (!result.IsSuccess) return result.ToActionResult("AUTH_PASSWORD_RESET_REQUEST");
 
         return Ok(new ApiResponse<object>
         {
             Success = true,
-            Code = StatusCodes.Status200OK,
+            Code = (int)result.StatusCode,
             Message = "OTP sent.",
             Operation = "AUTH_PASSWORD_RESET_REQUEST",
 #if DEBUG
-            Data = new { Otp = code }
+            Data = new { Token = result.Data }
 #endif
         });
     }
@@ -39,20 +42,7 @@ public class PasswordResetController(IAuthService authService) : ControllerBase
     [HttpPost("reset")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        Console.WriteLine($"[DEBUG] ResetPassword called. Email: '{request.Email}', Token: '{request.Token}', NewPassword length: {request.NewPassword?.Length}");
         var result = await authService.ResetPasswordAsync(request);
-
-        if (!result)
-        {
-            throw new BadRequestException("Invalid token or email.");
-        }
-
-        return Ok(new ApiResponse<object>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Password reset successful.",
-            Operation = "AUTH_PASSWORD_RESET_EXECUTE"
-        });
+        return result.ToActionResult("AUTH_PASSWORD_RESET_EXECUTE");
     }
 }

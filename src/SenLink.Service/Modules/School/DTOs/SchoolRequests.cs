@@ -17,7 +17,10 @@ public record CreateTeacherProfileOnboardingRequest(
     string NameKana,
     string? Title,
     string? OfficeLocation,
+    List<TeacherClassAssignmentDto>? AssignedClasses = null,
     TeacherProfileDataDto? ProfileData = null);
+
+public record TeacherClassAssignmentDto(long ClassId, int Role);
 
 public record UpdateStudentProfileRequest(
     string? Pr,

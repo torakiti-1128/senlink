@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using SenLink.Service.Modules.School.DTOs;
 using SenLink.Service.Modules.School.Interfaces;
 using SenLink.Api.Models;
-using SenLink.Api.Middlewares;
+using SenLink.Api.Extensions;
 using System.Security.Claims;
+using System.Net;
 
 namespace SenLink.Api.Modules.School.Controllers;
 
@@ -26,20 +27,17 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     public async Task<IActionResult> CreateStudentProfile([FromBody] CreateStudentProfileOnboardingRequest request)
     {
         long accountId = GetCurrentAccountId();
-        var response = await schoolService.CreateStudentProfileAsync(accountId, request);
+        var result = await schoolService.CreateStudentProfileAsync(accountId, request);
 
-        if (response == null)
-        {
-            throw new ConflictException("Student profile already exists or student number is duplicated.");
-        }
+        if (!result.IsSuccess) return result.ToActionResult("SCHOOL_STUDENT_ONBOARDING_CREATE");
 
         return Created("", new ApiResponse<StudentProfileCreatedResponse>
         {
             Success = true,
-            Code = StatusCodes.Status201Created,
-            Message = "Student profile created",
+            Code = (int)HttpStatusCode.Created,
+            Message = result.Message,
             Operation = "SCHOOL_STUDENT_ONBOARDING_CREATE",
-            Data = response
+            Data = result.Data
         });
     }
 
@@ -52,21 +50,8 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     public async Task<IActionResult> GetStudentMe()
     {
         long accountId = GetCurrentAccountId();
-        var response = await schoolService.GetStudentMeAsync(accountId);
-
-        if (response == null)
-        {
-            throw new NotFoundException("Student profile not found.");
-        }
-
-        return Ok(new ApiResponse<StudentMeResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "OK",
-            Operation = "SCHOOL_STUDENT_ME_GET",
-            Data = response
-        });
+        var result = await schoolService.GetStudentMeAsync(accountId);
+        return result.ToActionResult("SCHOOL_STUDENT_ME_GET");
     }
 
     /// <summary>
@@ -79,17 +64,8 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     public async Task<IActionResult> UpdateStudentProfile([FromBody] UpdateStudentProfileRequest request)
     {
         long accountId = GetCurrentAccountId();
-        var success = await schoolService.UpdateStudentProfileAsync(accountId, request);
-
-        if (!success) throw new NotFoundException("Student profile not found.");
-
-        return Ok(new ApiResponse<object>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Profile updated",
-            Operation = "SCHOOL_STUDENT_ME_PROFILE_UPDATE"
-        });
+        var result = await schoolService.UpdateStudentProfileAsync(accountId, request);
+        return result.ToActionResult("SCHOOL_STUDENT_ME_PROFILE_UPDATE");
     }
 
     /// <summary>
@@ -102,17 +78,8 @@ public class StudentController(ISchoolService schoolService) : ControllerBase
     public async Task<IActionResult> UpdateJobHuntingStatus([FromBody] UpdateJobHuntingStatusRequest request)
     {
         long accountId = GetCurrentAccountId();
-        var success = await schoolService.UpdateJobHuntingStatusAsync(accountId, request);
-
-        if (!success) throw new NotFoundException("Student profile not found.");
-
-        return Ok(new ApiResponse<object>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Job hunting status updated",
-            Operation = "SCHOOL_STUDENT_ME_JOB_HUNTING_UPDATE"
-        });
+        var result = await schoolService.UpdateJobHuntingStatusAsync(accountId, request);
+        return result.ToActionResult("SCHOOL_STUDENT_ME_JOB_HUNTING_UPDATE");
     }
 
     private long GetCurrentAccountId()

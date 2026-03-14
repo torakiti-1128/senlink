@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Api.Models;
-using SenLink.Api.Middlewares;
+using SenLink.Api.Extensions;
 
 namespace SenLink.Api.Modules.Auth.Controllers;
 
@@ -25,21 +25,8 @@ public class AuthController(IAuthService authService) : ControllerBase
             UserAgent = Request.Headers.UserAgent.ToString()
         };
 
-        var response = await authService.LoginAsync(fullRequest);
-
-        if (response == null)
-        {
-            throw new UnauthorizedException("Invalid email or password.");
-        }
-
-        return Ok(new ApiResponse<AuthResponse>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Login successful.",
-            Operation = "AUTH_LOGIN",
-            Data = response
-        });
+        var result = await authService.LoginAsync(fullRequest);
+        return result.ToActionResult("AUTH_LOGIN");
     }
 
     /// <summary>
@@ -49,18 +36,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var result = await authService.RegisterAsync(request);
-
-        if (!result)
-        {
-            throw new BadRequestException("Registration failed. Please check your domain or duplicate email.");
-        }
-
-        return Ok(new ApiResponse<object>
-        {
-            Success = true,
-            Code = StatusCodes.Status200OK,
-            Message = "Registration successful.",
-            Operation = "AUTH_REGISTER"
-        });
+        return result.ToActionResult("AUTH_REGISTER");
     }
 }
