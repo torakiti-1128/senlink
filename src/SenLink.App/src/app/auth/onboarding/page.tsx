@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -100,6 +100,17 @@ function OnboardingContent() {
       name: "", nameKana: "", title: "", officeLocation: "", message: "",
       assignedClasses: [], specialities: []
     }
+  });
+
+  // フォーム値を監視してリアクティブにする
+  const watchedStudentDeptId = useWatch({
+    control: studentForm.control,
+    name: "departmentId"
+  });
+
+  const watchedAssignedClasses = useWatch({
+    control: teacherForm.control,
+    name: "assignedClasses"
   });
 
   const { fields: academicFields, append: appendAcademic, remove: removeAcademic } = useFieldArray({ control: studentForm.control, name: "academicHistories" });
@@ -273,9 +284,9 @@ function OnboardingContent() {
                           name="classId"
                           control={studentForm.control}
                           render={({ field }) => (
-                            <Select onValueChange={field.onChange} value={field.value || ""} disabled={!studentForm.getValues("departmentId")}>
-                              <SelectTrigger className={`rounded-xl h-11 ${studentForm.formState.errors.classId ? 'border-red-500' : 'border-slate-200'}`}><SelectValue>{classesByDept[studentForm.getValues("departmentId")]?.find(c => c.classId.toString() === field.value)?.name || "クラスを選択"}</SelectValue></SelectTrigger>
-                              <SelectContent>{(classesByDept[studentForm.getValues("departmentId")] || []).map((c) => (<SelectItem key={c.classId} value={c.classId.toString()}>{c.name}</SelectItem>))}</SelectContent>
+                            <Select onValueChange={field.onChange} value={field.value || ""} disabled={!watchedStudentDeptId}>
+                              <SelectTrigger className={`rounded-xl h-11 ${studentForm.formState.errors.classId ? 'border-red-500' : 'border-slate-200'}`}><SelectValue>{classesByDept[watchedStudentDeptId]?.find(c => c.classId.toString() === field.value)?.name || "クラスを選択"}</SelectValue></SelectTrigger>
+                              <SelectContent>{(classesByDept[watchedStudentDeptId] || []).map((c) => (<SelectItem key={c.classId} value={c.classId.toString()}>{c.name}</SelectItem>))}</SelectContent>
                             </Select>
                           )}
                         />
@@ -391,41 +402,44 @@ function OnboardingContent() {
                         <Button type="button" variant="outline" size="sm" onClick={() => appendAssigned({ departmentId: "", classId: "", role: "0" })} className="rounded-lg h-8 px-3 border-indigo-200 text-indigo-600">クラスを追加</Button>
                       </div>
                       <div className="grid gap-3">
-                        {assignedFields.map((field, index) => (
-                          <div key={field.id} className={`grid grid-cols-1 md:grid-cols-12 gap-3 p-4 border rounded-xl bg-slate-50/50 relative ${teacherForm.formState.errors.assignedClasses?.[index] ? 'border-red-300' : 'border-slate-100'}`}>
-                            <div className="md:col-span-4">
-                              <Controller name={`assignedClasses.${index}.departmentId`} control={teacherForm.control} render={({ field: f }) => (
-                                <Select onValueChange={(val) => { f.onChange(val); teacherForm.setValue(`assignedClasses.${index}.classId`, ""); fetchClassesForDept(val); }} value={f.value || ""}>
-                                  <SelectTrigger className="h-10 bg-white"><SelectValue>{departments.find(d => d.departmentId.toString() === f.value)?.name || "学科を選択"}</SelectValue></SelectTrigger>
-                                  <SelectContent>{departments.map((d) => (<SelectItem key={d.departmentId} value={d.departmentId.toString()}>{d.name}</SelectItem>))}</SelectContent>
-                                </Select>
-                              )} />
+                        {assignedFields.map((field, index) => {
+                          const currentDeptId = watchedAssignedClasses[index]?.departmentId;
+                          return (
+                            <div key={field.id} className={`grid grid-cols-1 md:grid-cols-12 gap-3 p-4 border rounded-xl bg-slate-50/50 relative ${teacherForm.formState.errors.assignedClasses?.[index] ? 'border-red-300' : 'border-slate-100'}`}>
+                              <div className="md:col-span-4">
+                                <Controller name={`assignedClasses.${index}.departmentId`} control={teacherForm.control} render={({ field: f }) => (
+                                  <Select onValueChange={(val) => { f.onChange(val); teacherForm.setValue(`assignedClasses.${index}.classId`, ""); fetchClassesForDept(val); }} value={f.value || ""}>
+                                    <SelectTrigger className="h-10 bg-white"><SelectValue>{departments.find(d => d.departmentId.toString() === f.value)?.name || "学科を選択"}</SelectValue></SelectTrigger>
+                                    <SelectContent>{departments.map((d) => (<SelectItem key={d.departmentId} value={d.departmentId.toString()}>{d.name}</SelectItem>))}</SelectContent>
+                                  </Select>
+                                )} />
+                              </div>
+                              <div className="md:col-span-4">
+                                <Controller name={`assignedClasses.${index}.classId`} control={teacherForm.control} render={({ field: f }) => (
+                                  <Select onValueChange={f.onChange} value={f.value || ""} disabled={!currentDeptId}>
+                                    <SelectTrigger className="h-10 bg-white"><SelectValue>{classesByDept[currentDeptId]?.find(c => c.classId.toString() === f.value)?.name || "クラスを選択"}</SelectValue></SelectTrigger>
+                                    <SelectContent>{(classesByDept[currentDeptId] || []).map((c) => (<SelectItem key={c.classId} value={c.classId.toString()}>{c.name}</SelectItem>))}</SelectContent>
+                                  </Select>
+                                )} />
+                              </div>
+                              <div className="md:col-span-3">
+                                <Controller name={`assignedClasses.${index}.role`} control={teacherForm.control} render={({ field: f }) => (
+                                  <Select onValueChange={f.onChange} value={f.value || "0"}>
+                                    <SelectTrigger className="h-10 bg-white"><SelectValue>{getRoleName(f.value)}</SelectValue></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="0">担任</SelectItem>
+                                      <SelectItem value="1">副担任</SelectItem>
+                                      <SelectItem value="2">教科担任</SelectItem>
+                                      <SelectItem value="3">キャリアセンター</SelectItem>
+                                      <SelectItem value="9">その他</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )} />
+                              </div>
+                              <div className="md:col-span-1 flex justify-end items-center"><Button type="button" variant="ghost" size="icon" onClick={() => removeAssigned(index)} className="text-red-400 h-8 w-8"><Trash2Icon size={16} /></Button></div>
                             </div>
-                            <div className="md:col-span-4">
-                              <Controller name={`assignedClasses.${index}.classId`} control={teacherForm.control} render={({ field: f }) => (
-                                <Select onValueChange={f.onChange} value={f.value || ""} disabled={!teacherForm.getValues(`assignedClasses.${index}.departmentId`)}>
-                                  <SelectTrigger className="h-10 bg-white"><SelectValue>{classesByDept[teacherForm.getValues(`assignedClasses.${index}.departmentId`)]?.find(c => c.classId.toString() === f.value)?.name || "クラスを選択"}</SelectValue></SelectTrigger>
-                                  <SelectContent>{(classesByDept[teacherForm.getValues(`assignedClasses.${index}.departmentId`)] || []).map((c) => (<SelectItem key={c.classId} value={c.classId.toString()}>{c.name}</SelectItem>))}</SelectContent>
-                                </Select>
-                              )} />
-                            </div>
-                            <div className="md:col-span-3">
-                              <Controller name={`assignedClasses.${index}.role`} control={teacherForm.control} render={({ field: f }) => (
-                                <Select onValueChange={f.onChange} value={f.value || "0"}>
-                                  <SelectTrigger className="h-10 bg-white"><SelectValue>{getRoleName(f.value)}</SelectValue></SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="0">担任</SelectItem>
-                                    <SelectItem value="1">副担任</SelectItem>
-                                    <SelectItem value="2">教科担任</SelectItem>
-                                    <SelectItem value="3">キャリアセンター</SelectItem>
-                                    <SelectItem value="9">その他</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              )} />
-                            </div>
-                            <div className="md:col-span-1 flex justify-end items-center"><Button type="button" variant="ghost" size="icon" onClick={() => removeAssigned(index)} className="text-red-400 h-8 w-8"><Trash2Icon size={16} /></Button></div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                       {teacherForm.formState.errors.assignedClasses && <p className="text-xs text-red-500 font-medium px-1">{teacherForm.formState.errors.assignedClasses.message || "学科とクラスを選択してください"}</p>}
                     </div>
