@@ -87,6 +87,9 @@ public static class HostingExtensions
         // Serilog によるアクセスログ
         app.UseSerilogRequestLogging();
 
+        // CORSを最優先で有効化（プリフライトリクエストを処理）
+        app.UseCors("DefaultPolicy");
+
         // リバースプロキシ対応
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
@@ -104,7 +107,6 @@ public static class HostingExtensions
         // 基本ミドルウェア
         app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseExceptionHandler();
-        app.UseCors("DefaultPolicy"); // CORSを有効化
         app.UseMiddleware<CampusIpRestriction>();
 
         // 認証・認可

@@ -6,20 +6,14 @@ using SenLink.Api.Middlewares;
 
 namespace SenLink.Api.Modules.Auth.Controllers;
 
-/// <summary>
-/// ワンタイムパスワード（OTP）に関連する認証を管理するコントローラー
-/// </summary>
 [ApiController]
 [Route("api/v1/auth/otp")]
 public class OtpController(IAuthService authService) : ControllerBase
 {
-    /// <summary>
-    /// OTP要求
-    /// </summary>
     [HttpPost("request")]
-    public async Task<IActionResult> RequestOtp([FromBody] RequestOtpRequest request)
+    public async Task<IActionResult> RequestOtp([FromBody] OtpRequestDto request)
     {
-        var code = await authService.GenerateOtpAsync(request.Email);
+        var code = await authService.GenerateOtpAsync(request.Email, request.Purpose);
         
         return Ok(new ApiResponse<object>
         {
@@ -33,25 +27,28 @@ public class OtpController(IAuthService authService) : ControllerBase
         });
     }
 
-    /// <summary>
-    /// OTP検証
-    /// </summary>
     [HttpPost("verify")]
-    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    public async Task<IActionResult> VerifyOtp([FromBody] OtpVerifyRequestDto request)
     {
-        var result = await authService.VerifyOtpAsync(request);
+        var authResponse = await authService.VerifyOtpAndLoginAsync(
+            new VerifyOtpRequest(request.Email, request.Otp), 
+            request.Purpose);
 
-        if (!result)
+        if (authResponse == null)
         {
             throw new BadRequestException("Invalid or expired OTP.");
         }
 
-        return Ok(new ApiResponse<object>
+        return Ok(new ApiResponse<AuthResponse>
         {
             Success = true,
             Code = StatusCodes.Status200OK,
             Message = "OTP verified.",
-            Operation = "AUTH_OTP_VERIFY"
+            Operation = "AUTH_OTP_VERIFY",
+            Data = authResponse
         });
     }
 }
+
+public record OtpRequestDto(string Email, string Purpose);
+public record OtpVerifyRequestDto(string Email, string Otp, string Purpose);
