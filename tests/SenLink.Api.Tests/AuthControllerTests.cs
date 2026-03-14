@@ -112,7 +112,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         string resetToken = resetTokenResult.Data.Token;
 
         // 6. Reset Password Execute
-        var executeReset = new ResetPasswordRequest(resetToken, "NewStrongPass789!");
+        var executeReset = new ResetPasswordRequest("test-user@senlink.dev", resetToken, "NewStrongPass789!");
         var executeResponse = await _client.PostAsJsonAsync("/api/v1/auth/password-reset/reset", executeReset);
         Assert.Equal(HttpStatusCode.OK, executeResponse.StatusCode);
 
