@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SenLink.Api.Models;
+using SenLink.Shared.Models;
 
 namespace SenLink.Api.Filters
 {

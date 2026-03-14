@@ -35,12 +35,3 @@ public class ErrorDetail
     public string Type { get; set; } = string.Empty;
     public object? Details { get; set; }
 }
-
-/// <summary>
-/// バリデーションエラーの詳細
-/// </summary>
-public class ValidationErrorDetail
-{
-    public string Field { get; set; } = string.Empty;
-    public string Reason { get; set; } = string.Empty;
-}
