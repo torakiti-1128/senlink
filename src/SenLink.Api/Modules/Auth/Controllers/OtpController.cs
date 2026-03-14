@@ -27,7 +27,9 @@ public class OtpController(IAuthService authService) : ControllerBase
             Code = StatusCodes.Status200OK,
             Message = "OTP sent.",
             Operation = "AUTH_OTP_REQUEST",
+#if DEBUG
             Data = new { Otp = code }
+#endif
         });
     }
 

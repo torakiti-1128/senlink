@@ -5,6 +5,7 @@ using SenLink.Domain.Modules.Auth.Repositories;
 using SenLink.Service.Modules.Auth.DTOs;
 using SenLink.Service.Modules.Auth.Interfaces;
 using SenLink.Service.Modules.Maintenance.Interfeces;
+using SenLink.Service.Common.Interfaces;
 
 namespace SenLink.Service.Modules.Auth.Services;
 
@@ -16,7 +17,8 @@ public class AuthService(
     ILoginHistoryRepository loginHistoryRepository,
     IOneTimePasswordRepository otpRepository,
     ITokenService tokenService,
-    ISystemSettingProvider settingProvider) : IAuthService
+    ISystemSettingProvider settingProvider,
+    IEmailSender emailSender) : IAuthService
 {
     /// <summary>
     /// ログイン処理
@@ -99,7 +101,12 @@ public class AuthService(
         // 既存のOTPがあれば無効化
         await otpRepository.AddAsync(otp);
 
-        // ToDo: 実際の運用ではここでメール送信処理を呼び出す
+        // メール送信（開発環境ではログ出力）
+        await emailSender.SendEmailAsync(
+            email, 
+            "【SenLink】認証コードのご案内", 
+            $"あなたの認証コードは {otp.Code} です。有効期限は1時間です。");
+
         return otp.Code;
     }
 
@@ -143,9 +150,9 @@ public class AuthService(
     /// </summary>
     public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
     {
-    // OneTimePasswordテーブルをトークン保存に流用
-    var otp = await otpRepository.GetValidByTokenAsync(request.Token, "PasswordReset");
-    if (otp == null) return false;
+        // OneTimePasswordテーブルをトークン保存に流用
+        var otp = await otpRepository.GetValidByTokenAsync(request.Token, "PasswordReset");
+        if (otp == null) return false;
 
 
         var account = await accountRepository.GetByEmailAsync(otp.Email);

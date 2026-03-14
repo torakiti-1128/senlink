@@ -27,7 +27,9 @@ public class PasswordResetController(IAuthService authService) : ControllerBase
             Code = StatusCodes.Status200OK,
             Message = "Reset token generated.",
             Operation = "AUTH_PASSWORD_RESET_REQUEST",
+#if DEBUG
             Data = new { Token = token }
+#endif
         });
     }
 
