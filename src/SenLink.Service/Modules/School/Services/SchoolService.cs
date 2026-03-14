@@ -57,7 +57,7 @@ public class SchoolService(
             Gender = (Gender)request.Gender,
             AdmissionYear = request.AdmissionYear,
             IsJobHunting = request.IsJobHunting,
-            ProfileData = MapToEntity(request.ProfileData, request.Pr)
+            ProfileData = MapStudentToEntity(request.ProfileData, request.Pr)
         };
 
         await studentRepository.AddAsync(student);
@@ -81,7 +81,8 @@ public class SchoolService(
             Name = request.Name,
             NameKana = request.NameKana,
             Title = request.Title,
-            OfficeLocation = request.OfficeLocation
+            OfficeLocation = request.OfficeLocation,
+            ProfileData = MapTeacherToEntity(request.ProfileData)
         };
 
         await teacherRepository.AddAsync(teacher);
@@ -113,7 +114,7 @@ public class SchoolService(
             (short)student.Gender,
             student.AdmissionYear,
             student.IsJobHunting,
-            MapToDto(student.ProfileData));
+            MapStudentToDto(student.ProfileData));
     }
 
     public async Task<TeacherMeResponse?> GetTeacherMeAsync(long accountId)
@@ -128,7 +129,7 @@ public class SchoolService(
             teacher.NameKana,
             teacher.Title,
             teacher.OfficeLocation,
-            teacher.ProfileData);
+            MapTeacherToDto(teacher.ProfileData));
     }
 
     public async Task<bool> UpdateStudentProfileAsync(long accountId, UpdateStudentProfileRequest request)
@@ -136,7 +137,7 @@ public class SchoolService(
         var student = await studentRepository.GetByAccountIdAsync(accountId);
         if (student == null) return false;
 
-        student.ProfileData = MapToEntity(request.ProfileData, request.Pr, request.Certifications, request.Links);
+        student.ProfileData = MapStudentToEntity(request.ProfileData, request.Pr, request.Certifications, request.Links);
 
         await studentRepository.UpdateAsync(student);
         return true;
@@ -161,15 +162,15 @@ public class SchoolService(
         teacher.Title = request.Title;
         teacher.OfficeLocation = request.OfficeLocation;
 
-        teacher.ProfileData ??= new TeacherProfile();
-        teacher.ProfileData.Career = request.Career;
-        teacher.ProfileData.Speciality = request.Speciality;
+        teacher.ProfileData = MapTeacherToEntity(request.ProfileData, request.Career, request.Speciality);
 
         await teacherRepository.UpdateAsync(teacher);
         return true;
     }
 
-    private static StudentProfile MapToEntity(StudentProfileDataDto? dto, string? pr = null, string? certs = null, string? links = null)
+    // --- Students Mapping ---
+
+    private static StudentProfile MapStudentToEntity(StudentProfileDataDto? dto, string? pr = null, string? certs = null, string? links = null)
     {
         var entity = new StudentProfile
         {
@@ -239,7 +240,7 @@ public class SchoolService(
         return entity;
     }
 
-    private static StudentProfileDataDto? MapToDto(StudentProfile? entity)
+    private static StudentProfileDataDto? MapStudentToDto(StudentProfile? entity)
     {
         if (entity == null) return null;
 
@@ -250,6 +251,89 @@ public class SchoolService(
             Skills: entity.Skills != null ? new SkillSetDto(entity.Skills.Languages, entity.Skills.Frameworks, entity.Skills.Others) : null,
             SocialLinks: entity.SocialLinks != null ? new SocialLinksDto(entity.SocialLinks.Github, entity.SocialLinks.Portfolio, entity.SocialLinks.Blog, entity.SocialLinks.Twitter) : null,
             SelfPromotion: entity.SelfPromotion != null ? new SelfPromotionDetailDto(entity.SelfPromotion.Catchphrase, entity.SelfPromotion.Content, entity.SelfPromotion.Strengths) : null
+        );
+    }
+
+    // --- Teachers Mapping ---
+
+    private static TeacherProfile MapTeacherToEntity(TeacherProfileDataDto? dto, string? career = null, string? speciality = null)
+    {
+        var entity = new TeacherProfile
+        {
+            Career = career,
+            Speciality = speciality
+        };
+
+        if (dto == null) return entity;
+
+        if (dto.CareerHistory != null)
+        {
+            entity.CareerHistory = new CareerInfo
+            {
+                Summary = dto.CareerHistory.Summary,
+                Details = dto.CareerHistory.Details?.Select(d => new CareerDetail
+                {
+                    Period = d.Period,
+                    Organization = d.Organization,
+                    Content = d.Content
+                }).ToList()
+            };
+        }
+
+        entity.SpecialityDetails = dto.SpecialityDetails?.Select(s => new SpecialityDetail
+        {
+            Name = s.Name,
+            Description = s.Description
+        }).ToList();
+
+        if (dto.Consultation != null)
+        {
+            entity.Consultation = new ConsultationInfo
+            {
+                Style = dto.Consultation.Style,
+                AvailableTopics = dto.Consultation.AvailableTopics,
+                OfficeHours = dto.Consultation.OfficeHours
+            };
+        }
+
+        entity.Message = dto.Message;
+
+        if (dto.SocialLinks != null)
+        {
+            entity.SocialLinks = new SocialLinks
+            {
+                Github = dto.SocialLinks.Github,
+                Portfolio = dto.SocialLinks.Portfolio,
+                Blog = dto.SocialLinks.Blog,
+                Twitter = dto.SocialLinks.Twitter
+            };
+        }
+
+        return entity;
+    }
+
+    private static TeacherProfileDataDto? MapTeacherToDto(TeacherProfile? entity)
+    {
+        if (entity == null) return null;
+
+        return new TeacherProfileDataDto(
+            CareerHistory: entity.CareerHistory != null ? new CareerInfoDto(
+                entity.CareerHistory.Summary,
+                entity.CareerHistory.Details?.Select(d => new CareerDetailDto(d.Period, d.Organization, d.Content)).ToList()
+            ) : null,
+            SpecialityDetails: entity.SpecialityDetails?.Select(s => new SpecialityDetailDto(s.Name, s.Description)).ToList(),
+            Consultation: entity.Consultation != null ? new ConsultationInfoDto(
+                entity.Consultation.Style,
+                entity.Consultation.AvailableTopics,
+                entity.Consultation.OfficeHours
+            ) : null,
+            Message: entity.Message,
+            SocialLinks: entity.SocialLinks != null ? new SocialLinksDto(
+                entity.SocialLinks.Github,
+                entity.SocialLinks.Portfolio,
+                entity.SocialLinks.Blog,
+                entity.SocialLinks.Twitter
+            ) : null
         );
     }
 }

@@ -17,7 +17,7 @@ public record CreateTeacherProfileOnboardingRequest(
     string NameKana,
     string? Title,
     string? OfficeLocation,
-    object? ProfileData);
+    TeacherProfileDataDto? ProfileData = null);
 
 public record UpdateStudentProfileRequest(
     string? Pr,
@@ -32,9 +32,10 @@ public record UpdateTeacherProfileRequest(
     string? Title,
     string? OfficeLocation,
     string? Career,
-    string? Speciality);
+    string? Speciality,
+    TeacherProfileDataDto? ProfileData = null);
 
-// ProfileData の詳細構造
+// 学生 ProfileData の詳細構造
 public record StudentProfileDataDto(
     List<AcademicHistoryDto>? AcademicHistories = null,
     List<WorkHistoryDto>? WorkHistories = null,
@@ -78,3 +79,34 @@ public record SelfPromotionDetailDto(
     string? Catchphrase,
     string? Content,
     List<string>? Strengths);
+
+// 教員 ProfileData の詳細構造
+public record TeacherProfileDataDto(
+    CareerInfoDto? CareerHistory = null,
+    List<SpecialityDetailDto>? SpecialityDetails = null,
+    ConsultationInfoDto? Consultation = null,
+    string? Message = null,
+    SocialLinksDto? SocialLinks = null
+);
+
+public record CareerInfoDto(
+    string? Summary,
+    List<CareerDetailDto>? Details
+);
+
+public record CareerDetailDto(
+    string? Period,
+    string? Organization,
+    string? Content
+);
+
+public record SpecialityDetailDto(
+    string Name,
+    string? Description
+);
+
+public record ConsultationInfoDto(
+    string? Style,
+    List<string>? AvailableTopics,
+    string? OfficeHours
+);

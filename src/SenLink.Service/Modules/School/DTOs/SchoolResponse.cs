@@ -45,4 +45,4 @@ public record TeacherMeResponse(
     string NameKana,
     string? Title,
     string? OfficeLocation,
-    object? ProfileData);
+    TeacherProfileDataDto? ProfileData);

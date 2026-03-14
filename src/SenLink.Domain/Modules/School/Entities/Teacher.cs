@@ -32,9 +32,50 @@ public class Teacher : BaseEntity
 // 教師のプロフィールデータ構造定義
 public class TeacherProfile
 {
-    // 経歴
+    // 経歴 (簡易文字列)
     public string? Career { get; set; }
 
-    // 専門分野
+    // 専門分野 (簡易文字列)
     public string? Speciality { get; set; }
+
+    // 構造化された経歴
+    public CareerInfo? CareerHistory { get; set; }
+
+    // 専門分野詳細
+    public List<SpecialityDetail>? SpecialityDetails { get; set; }
+
+    // 相談に関する案内
+    public ConsultationInfo? Consultation { get; set; }
+
+    // 学生へのメッセージ
+    public string? Message { get; set; }
+
+    // 外部リンク
+    public SocialLinks? SocialLinks { get; set; }
+}
+
+public class CareerInfo
+{
+    public string? Summary { get; set; }
+    public List<CareerDetail>? Details { get; set; }
+}
+
+public class CareerDetail
+{
+    public string? Period { get; set; }
+    public string? Organization { get; set; }
+    public string? Content { get; set; }
+}
+
+public class SpecialityDetail
+{
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+}
+
+public class ConsultationInfo
+{
+    public string? Style { get; set; }
+    public List<string>? AvailableTopics { get; set; }
+    public string? OfficeHours { get; set; }
 }
